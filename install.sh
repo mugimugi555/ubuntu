@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#
+# curl https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install.sh | bash ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # home jp 2 english

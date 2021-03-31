@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # curl https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install.sh | bash ;
+#
+# or save and edit file
+#
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install.sh && gedit install.sh ;
+# bash install.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # home jp 2 english

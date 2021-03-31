@@ -91,7 +91,7 @@ gsettings set org.gnome.shell favorite-apps ['google-chrome.desktop', 'org.gnome
 #-----------------------------------------------------------------------------------------------------------------------
 # caps2ctrl
 #-----------------------------------------------------------------------------------------------------------------------
-MOGE=$(cat<<TEXT
+CAPS2CTRL=$(cat<<TEXT
 BACKSPACE="guess"
 XKBMODEL="pc105"
 XKBLAYOUT="jp"
@@ -100,9 +100,9 @@ XKBOPTIONS="ctrl:nocaps"
 TEXT
 )
 
-sudo echo "$MOGE" | sudo tee /etc/default/keyboard
+sudo echo "$CAPS2CTRL" | sudo tee /etc/default/keyboard
 
-HOGE=$(cat<<TEXT
+MYKEYBOARD=$(cat<<TEXT
 <component>
   <version>2.23.2815.102+dfsg-8ubuntu1</version>
   <name>com.google.IBus.Mozc</name>
@@ -129,7 +129,7 @@ HOGE=$(cat<<TEXT
 </component>
 TEXT
 )
-sudo echo "$HOGE" | sudo tee /usr/share/ibus/component/mozc.xml ;
+sudo echo "$MYKEYBOARD" | sudo tee /usr/share/ibus/component/mozc.xml ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # alias

@@ -48,6 +48,17 @@ sudo apt install -y emacs-nox htop curl git axel samba openssh-server net-tools 
 sudo apt autoremove -y ;
 
 #-----------------------------------------------------------------------------------------------------------------------
+# vscode
+#-----------------------------------------------------------------------------------------------------------------------
+sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list' ;
+sudo apt update ;
+curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg ;
+sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/ ;
+sudo apt update ;
+sudo apt install -y code ;
+rm microsoft.gpg ;
+
+#-----------------------------------------------------------------------------------------------------------------------
 # setting jp
 #-----------------------------------------------------------------------------------------------------------------------
 sudo update-locale LANG=ja_JP.UTF8 ;

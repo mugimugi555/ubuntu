@@ -1,6 +1,6 @@
 !#/usr/bin/bash
 
-# 
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_usbrh.sh && bash install_usbrh.sh ;
 
 sudo echo ;
 sudo apt install -y build-essential ;

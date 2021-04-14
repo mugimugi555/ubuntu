@@ -28,8 +28,8 @@ echo 'Defaults timestamp_timeout = 1200' | sudo EDITOR='tee -a' visudo ;
 #-----------------------------------------------------------------------------------------------------------------------
 # wall paper
 #-----------------------------------------------------------------------------------------------------------------------
-wget http://gahag.net/img/201602/11s/gahag-0055029460-1.jpg -O /home/$USERNAME/Pictures/1.jpg ;
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$USERNAME/Pictures/1.jpg" ;
+wget http://gahag.net/img/201602/11s/gahag-0055029460-1.jpg -O /home/$USER/Pictures/1.jpg ;
+gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Pictures/1.jpg" ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # proxy
@@ -71,8 +71,8 @@ sudo apt install -y ibus-mozc language-pack-gnome-ja language-pack-gnome-ja-base
 #-----------------------------------------------------------------------------------------------------------------------
 # wall paper
 #-----------------------------------------------------------------------------------------------------------------------
-wget moeten.info/1.jpg -O /home/$USERNAME/Pictures/1.jpg ;
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$USERNAME/Pictures/1.jpg" ;
+wget moeten.info/1.jpg -O /home/$USER/Pictures/1.jpg ;
+gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Pictures/1.jpg" ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # hdparm sleep hdd

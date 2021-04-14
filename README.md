@@ -9,3 +9,9 @@ Install power save
 ````
 wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_power_save.sh && bash install_power_save.sh ;
 ````
+
+Install usbrh
+
+````
+wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_usbrh.sh && bash install_usbrh.sh ;
+````

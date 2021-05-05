@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-# bash mix_print_coockie.sh
-# bash mix_print_coockie.sh google.com
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh google.com ;
 
 # coockie path
 CHROME="${HOME}/.config/google-chrome/Default"

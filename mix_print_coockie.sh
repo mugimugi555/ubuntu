@@ -3,6 +3,13 @@
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh ;
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh google.com ;
 
+# check sqlite3 installed
+pkg=sqlite3
+if [[ -z $(dpkg --get-selections | awk '{print $1}' | grep -x $pkg ) ]]; then
+    sudo echo
+    sudo apt install sqlite3
+fi
+
 # coockie path
 CHROME="${HOME}/.config/google-chrome/Default"
 COOKIES="$CHROME/Cookies"

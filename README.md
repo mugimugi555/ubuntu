@@ -21,3 +21,10 @@ Install OpenAPI ( intel c compiler )
 ````
 wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_openapi.sh && bash install_openapi.sh ;
 ````
+
+Mixture show chrome cookie
+
+````
+wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh ;
+wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/mix_print_coockie.sh && bash mix_print_coockie.sh google.com ;
+````

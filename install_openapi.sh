@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# install cmd
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_openapi.sh && bash install_openapi.sh ;
+
 # sudo
 sudo echo ;
 cd ;

@@ -64,12 +64,6 @@ sudo mkdir /usr/share/locale-langpack/ja ;
 sudo apt install -y ibus-mozc language-pack-gnome-ja language-pack-gnome-ja-base language-pack-ja language-pack-ja-base fonts-takao-gothic fonts-takao-mincho $(check-language-support) ;
 
 #-----------------------------------------------------------------------------------------------------------------------
-# wall paper
-#-----------------------------------------------------------------------------------------------------------------------
-wget moeten.info/1.jpg -O /home/$USER/Pictures/1.jpg ;
-gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Pictures/1.jpg" ;
-
-#-----------------------------------------------------------------------------------------------------------------------
 # hdparm sleep hdd
 #-----------------------------------------------------------------------------------------------------------------------
 sudo hdparm -S 242 /dev/sd* ;

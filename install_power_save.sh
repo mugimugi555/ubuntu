@@ -9,3 +9,7 @@ sudo add-apt-repository -y ppa:linrunner/tlp ;
 sudo apt-get update ;
 sudo apt install -y tlp tlp-rdw ;
 sudo tlp start ;
+
+sudo apt install -y gnome-shell-extensions ;
+google-chrome https://extensions.gnome.org/extension/1082/cpufreq/ &
+

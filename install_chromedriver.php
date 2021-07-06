@@ -1,6 +1,6 @@
 <?php
 
-# curl https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php | php ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 
 echo "=================================\n";
 echo "start check chrome driver version\n\n";

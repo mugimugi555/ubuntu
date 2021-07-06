@@ -9,7 +9,7 @@ echo "start check chrome driver version\n\n";
 $page_latest = file_get_contents( "https://chromedriver.storage.googleapis.com/LATEST_RELEASE" );
 
 echo "latest chrome driver version is \n\n";
-echo "     {$page_latest}\n\n";
+echo "    {$page_latest}\n\n";
 $latest_arr = explode( "." , $page_latest );
 $latest_version = $latest_arr[0];
 
@@ -36,8 +36,10 @@ rm chrome_driver_{$i}.zip
 BASH;
   exec( $CMD_UNZIP );
 
+  // generate start command
+  $page_version_pad = str_pad( $i, 3, '0', STR_PAD_LEFT);
   $CMD_BASH .= <<<BASH
-./chromedriver_{$i} --port=50{$i} &
+./chromedriver_{$i} --port=5{$page_version_pad} &
 
 BASH;
 

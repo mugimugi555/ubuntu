@@ -25,7 +25,7 @@ wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_openapi.s
 Install google chrome driver
 
 ````
-curl https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php | php ;
+wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 ````
 
 Mixture show chrome cookie

@@ -22,6 +22,12 @@ Install OpenAPI ( intel c compiler )
 wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_openapi.sh && bash install_openapi.sh ;
 ````
 
+Install google chrome driver
+
+````
+curl https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php | php ;
+````
+
 Mixture show chrome cookie
 
 ````

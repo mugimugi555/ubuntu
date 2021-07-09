@@ -7,18 +7,22 @@
 
 sudo echo ;
 
-echo "====================\n\n";
-echo "start hpa sas install.....\n\n";
+#
+echo "====================";
+echo "start hpa sas install.....";
 echo "deb https://downloads.linux.hpe.com/SDR/repo/mcp focal/current non-free" | sudo tee -a /etc/apt/sources.list.d/hpe.list ;
 
+#
 curl https://downloads.linux.hpe.com/SDR/hpPublicKey2048.pub | sudo apt-key add - ;
 curl https://downloads.linux.hpe.com/SDR/hpPublicKey2048_key1.pub | sudo apt-key add - ;
 curl https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key1.pub | sudo apt-key add - ;
 
+#
 sudo apt update ;
 sudo apt install ssa ssacli ssaducli ;
 
-echo "done\n\n";
-echo "====================\n\n";
-echo "please reboot\n\n";
-echo "sudo reboot now\n\n";
+#
+echo "done";
+echo "====================";
+echo "please reboot";
+echo "sudo reboot now";

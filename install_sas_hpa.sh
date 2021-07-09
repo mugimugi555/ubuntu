@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_sas_hpa.sh | bash install_sas_hpa.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_sas_hpa.sh && bash install_sas_hpa.sh ;
 
 # sudo emacs /etc/apt/sources.list.d/hpe.list ;
 # deb https://downloads.linux.hpe.com/SDR/repo/mcp focal/current non-free

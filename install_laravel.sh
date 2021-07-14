@@ -19,7 +19,6 @@ echo "hi" > ~/html/index.html ;
 xdg-open http://localhost/index.html &
 
 #
-composer global require laravel/installer ; # composer ver.1 error :-)
 composer global require laravel/installer ;
 PATH="$PATH:$HOME/bin:$HOME/.config/composer/vendor/bin" ;
 source .profile ;

@@ -30,3 +30,16 @@ echo "";
 pm2 startup ;
 echo "";
 sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER
+
+pm2 status ;
+
+xdg-open http://localhost:5089 &
+xdg-open http://localhost:5090 &
+xdg-open http://localhost:5091 &
+
+echo "";
+echo "here is a chrome drivers address";
+echo "";
+echo "http://localhost:5089";
+echo "http://localhost:5090";
+echo "http://localhost:5091";

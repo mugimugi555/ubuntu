@@ -11,5 +11,6 @@ sudo apt install -y tlp tlp-rdw ;
 sudo tlp start ;
 
 sudo apt install -y gnome-shell-extensions ;
-google-chrome https://extensions.gnome.org/extension/1082/cpufreq/ &
 
+echo "please install browser extension >";
+xdg-open https://extensions.gnome.org/extension/1082/cpufreq/ &

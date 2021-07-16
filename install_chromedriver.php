@@ -16,6 +16,8 @@ $latest_version = $latest_arr[0];
 // start command
 $CMD_BASH = "";
 
+@mkdir("chromedrivers");
+
 // download 3 version
 echo "start latest 3 version\n\n";
 for( $i = $latest_version - 3 ; $i <= $latest_version ; $i ++ ){
@@ -31,7 +33,7 @@ for( $i = $latest_version - 3 ; $i <= $latest_version ; $i ++ ){
   echo "unziping and rename to chromedriver_{$i}\n\n";
   $CMD_UNZIP = <<<BASH
 unzip -o chrome_driver_{$i}.zip &&
-mv -f chromedriver chromedriver_{$i} &&
+mv -f chromedriver chromedrivers/chromedriver_{$i} &&
 rm chrome_driver_{$i}.zip
 BASH;
   exec( $CMD_UNZIP );
@@ -39,7 +41,7 @@ BASH;
   // generate start command
   $page_version_pad = str_pad( $i, 3, '0', STR_PAD_LEFT);
   $CMD_BASH .= <<<BASH
-./chromedriver_{$i} --port=5{$page_version_pad} &
+./chromedrivers/chromedriver_{$i} --port=5{$page_version_pad} &
 
 BASH;
 
@@ -47,11 +49,11 @@ BASH;
 
 // copy to latest version
 $CMD = <<<BASH
-cp -f chromedriver_{$latest_version} chromedriver 
+cp -f chromedriver_{$latest_version} chromedrivers/chromedriver 
 BASH;
 exec( $CMD );
 $CMD_BASH .= <<<BASH
-./chromedriver    --port=5000 &
+./chromedrivers/chromedriver    --port=5000 &
 
 BASH;
 

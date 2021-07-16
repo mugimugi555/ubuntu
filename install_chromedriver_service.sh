@@ -11,7 +11,7 @@ wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_nodejs.sh
 wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 
 echo "";
-echo "========== install chrome driver service by pm2 ======";
+echo "========== install chrome driver service to pm2 ======";
 echo "";
 
 # install pm2 service
@@ -27,7 +27,7 @@ pm2 save ;
 echo "";
 echo "========== please hit the next command ======";
 echo "";
-echo "sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER"
+echo "sudo env PATH=\$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER"
 echo "";
 echo "=============================================";
 echo "";

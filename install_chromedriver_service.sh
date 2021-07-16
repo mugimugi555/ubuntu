@@ -32,3 +32,6 @@ echo "";
 echo "=============================================";
 echo "";
 pm2 startup ;
+echo "";
+echo "";
+sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER

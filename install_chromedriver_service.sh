@@ -10,6 +10,10 @@ wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_nodejs.sh
 # install chromedriver
 wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 
+echo "";
+echo "========== install chrome driver service by pm2 ======";
+echo "";
+
 # install pm2 service
 sudo npm install pm2 -g ;
 
@@ -20,5 +24,11 @@ pm2 start "/home/$USER/chromedrivers/chromedriver_91 --port=5091" --name=chromed
 pm2 save ;
 
 # auto start at logon
-echo "========== please hit the next command ======>";
+echo "";
+echo "========== please hit the next command ======";
+echo "";
+echo "sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER"
+echo "";
+echo "=============================================";
+echo "";
 pm2 startup ;

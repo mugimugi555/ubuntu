@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver_service.sh && bash install_chromedriver_service.sh ;
+
 cd ;
 
 # install nodejs npm
@@ -20,4 +22,3 @@ pm2 save ;
 # auto start at logon
 echo "========== please hit the next command ======>";
 pm2 startup ;
-

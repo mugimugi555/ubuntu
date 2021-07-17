@@ -14,8 +14,8 @@ echo "";
 echo "===================";
 echo "download file and extract";
 wget https://jaist.dl.sourceforge.net/project/gimp-print/gutenprint-5.3/5.3.4/gutenprint-5.3.4.tar.bz2 ;
-tar xvf  gutenprint* ;
-cd gutenprint* ;
+tar xvf gutenprint-5.3.4.tar.bz2 ;
+cd gutenprint-5.3.4/ ;
 echo "";
 
 echo "===================";

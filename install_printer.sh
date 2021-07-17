@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_printer.sh && bash install_printer.sh ;
 
 cd ;
 sudo echo ;
@@ -28,3 +28,6 @@ echo "";
 
 echo "===================";
 echo "cups install done";
+echo "";
+echo "please install downlad manuary";
+gnome-control-center printers &

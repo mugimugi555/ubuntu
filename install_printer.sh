@@ -41,7 +41,8 @@ echo "       cups install done";
 echo "";
 echo "=================================";
 echo "";
-echo "  please install downlad manuary";
+echo "  please install driver manuary";
 echo "";
 echo "=================================";
+echo "";
 gnome-control-center printers &

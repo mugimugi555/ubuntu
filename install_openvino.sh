@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_openvino.sh && bash install_openvino.sh ; 
 
 #
 echo "deb https://apt.repos.intel.com/openvino/2021 all main" | sudo tee /etc/apt/sources.list.d/intel-openvino-2021.list ;

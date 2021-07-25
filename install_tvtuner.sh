@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget 
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_tvtuner.sh && bash install_tvtuner ;
 
 # NOTE : I did not run this script test.
 

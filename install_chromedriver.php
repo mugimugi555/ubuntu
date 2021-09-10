@@ -49,7 +49,7 @@ BASH;
 
 // copy to latest version
 $CMD = <<<BASH
-cp -f chromedriver_{$latest_version} chromedrivers/chromedriver 
+cp -f ./chromedrivers/chromedriver_{$latest_version} chromedrivers/chromedriver 
 BASH;
 exec( $CMD );
 $CMD_BASH .= <<<BASH

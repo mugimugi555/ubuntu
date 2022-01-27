@@ -4,7 +4,7 @@
 
 cd;
 sudo echo;
-sudo apt install -y apache2 php php-xml mariadb-server ;
+sudo apt install -y apache2 php php-xml php-bcmath php-mbstring php-xml php-zip mariadb-server ;
 
 #
 php -r "copy ( 'https://getcomposer.org/installer', 'composer-setup.php' ) ;" ;

@@ -75,6 +75,14 @@ sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/you
 sudo chmod a+rx /usr/local/bin/youtube-dl ;
 
 #-----------------------------------------------------------------------------------------------------------------------
+# jless
+#-----------------------------------------------------------------------------------------------------------------------
+# curl -OL https://github.com/PaulJuliusMartinez/jless/releases/download/v0.7.1/jless-v0.7.1-x86_64-unknown-linux-gnu.zip ;
+# unzip jless-v0.7.1-x86_64-unknown-linux-gnu.zip
+# ./jless data.json
+# sudo mv jless /usr/local/bin/jless
+
+#-----------------------------------------------------------------------------------------------------------------------
 # chrome
 #-----------------------------------------------------------------------------------------------------------------------
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_current_amd64.deb ;

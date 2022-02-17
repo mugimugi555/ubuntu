@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# wget 
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chrome_remotedesktop.sh && bash install_chrome_remotedesktop.sh ;
 
 cd ;
 mkdir ~/.config/chrome-remote-desktop ;

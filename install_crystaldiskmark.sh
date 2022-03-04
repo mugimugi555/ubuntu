@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_crystaldiskmark.sh && bash install_crystaldiskmark.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # install fio

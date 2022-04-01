@@ -1,3 +1,5 @@
+# https://qiita.com/keoitate/items/efe4212b0074e10378ec
+
 import pyrealsense2 as rs
 import numpy as np
 

@@ -31,4 +31,6 @@ sudo realsense-viewer ;
 sudo pip3 install pyrealsense2 ;
 sudo pip3 install opencv-python ;
 sudo pip3 install numpy ;
-sudo python3 realsense.py ; 
+
+wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/realsense/realsense_1.py ;
+sudo python3 realsense_1.py ; 

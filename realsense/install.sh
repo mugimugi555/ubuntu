@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# wget 
+# wget wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/realsense/install.sh && bash install.sh ;
 
 sudo echo ;
 

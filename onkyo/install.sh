@@ -2,6 +2,8 @@
 
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/onkyo/install.sh && bash install.sh ;
 
+# lubuntu -> ubuntu desktop
+
 sudo echo ;
 
 #-----------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ sudo apt install -y ubuntu-desktop ;
 #-----------------------------------------------------------------------------------------------------------------------
 # update boot nomodeset mode
 #-----------------------------------------------------------------------------------------------------------------------
-sudo sed -ei 's/quiet splash”/quiet splash nomodeset”/g' /etc/default/grub ;
+sudo sed -ie 's/quiet splash"/quiet splash nomodeset"/g' /etc/default/grub ;
 sudo update-grub2 ;
 
 #-----------------------------------------------------------------------------------------------------------------------

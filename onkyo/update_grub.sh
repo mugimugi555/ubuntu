@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/onkyo/update_grub.sh && bash update_grub.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

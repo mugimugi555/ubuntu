@@ -8,7 +8,7 @@
 sudo apt update ;
 sudo apt upgrade -y ;
 sudo apt install -y ca-certificates apt-transport-https software-properties-common wget curl lsb-release ;
-sudo add-apt-repository ppa:ondrej/php 
+sudo add-apt-repository ppa:ondrej/php -y ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # install apache php mysql

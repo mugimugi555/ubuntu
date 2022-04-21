@@ -99,7 +99,7 @@ sudo sudo apt install -y ./google-chrome-stable_current_amd64.deb ;
 #-----------------------------------------------------------------------------------------------------------------------
 # gsettings list-recursively > 2.txt
 #-----------------------------------------------------------------------------------------------------------------------
-gsettings set org.gnome.shell favorite-apps ['google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gnome-control-center.desktop'] ;
+gsettings set org.gnome.shell favorite-apps "['google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gnome-control-center.desktop']" ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # caps2ctrl

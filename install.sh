@@ -112,8 +112,7 @@ XKBVARIANT=""
 XKBOPTIONS="ctrl:nocaps"
 TEXT
 )
-
-sudo echo "$CAPS2CTRL" | sudo tee /etc/default/keyboard
+sudo echo "$CAPS2CTRL" | sudo tee /etc/default/keyboard ;
 
 MYKEYBOARD=$(cat<<TEXT
 <component>

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/onkyo/install.sh && bash install.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/onkyo/install_ubuntu_desktop.sh && bash install_ubuntu_desktop.sh ;
 
 # lubuntu -> ubuntu desktop
 
@@ -16,12 +16,6 @@ echo 'Defaults timestamp_timeout = 1200' | sudo EDITOR='tee -a' visudo ;
 #-----------------------------------------------------------------------------------------------------------------------
 sudo apt update ;
 sudo apt upgrade -y ;
-
-#-----------------------------------------------------------------------------------------------------------------------
-# home dir to english
-#-----------------------------------------------------------------------------------------------------------------------
-sudo apt install -y xdg-user-dirs-gtk ;
-LANG=C xdg-user-dirs-gtk-update ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

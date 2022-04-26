@@ -102,6 +102,17 @@ sudo sudo apt install -y ./google-chrome-stable_current_amd64.deb ;
 gsettings set org.gnome.shell favorite-apps "['google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gnome-control-center.desktop']" ;
 
 #-----------------------------------------------------------------------------------------------------------------------
+#
+#-----------------------------------------------------------------------------------------------------------------------
+sudo sed -i 's/#NTP=/NTP=ntp.nict.jp/g' /etc/systemd/timesyncd.conf
+
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans CJK JP 11'
+gsettings set org.gnome.mutter auto-maximize false
+
+sudo apt install -y gnome-tweaks ;
+sudo apt install -y ubuntu-restricted-extras ;
+
+#-----------------------------------------------------------------------------------------------------------------------
 # caps2ctrl
 #-----------------------------------------------------------------------------------------------------------------------
 CAPS2CTRL=$(cat<<TEXT

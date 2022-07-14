@@ -1,5 +1,9 @@
 <?php
 
+#
+# crontab -e
+# */5 * * * * php /root/output.php
+
 exec( "/root/usbrh-linux/usbrh" , $result );
 $tmp = explode( " ", $result[0] );
 $RESULT_TMP = $tmp[0];

@@ -2,7 +2,8 @@
 
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/usbrh/install_usbrh.sh && bash install_usbrh.sh ;
 
-sudo echo ;
+sudo su -
+
 sudo apt install -y build-essential ;
 sudo apt install -y libusb-dev ;
 

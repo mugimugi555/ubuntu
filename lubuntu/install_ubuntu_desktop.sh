@@ -32,14 +32,14 @@ sudo update-grub2 ;
 #-----------------------------------------------------------------------------------------------------------------------
 # auto login on sddm
 #-----------------------------------------------------------------------------------------------------------------------
-MY_AUTO_LOGIN=$(cat<<TEXT
-[Autologin]
-Session=ubuntu.desktop
-User=$USER
-TEXT
-)
-sudo cp /etc/sddm.conf /etc/sddm.conf.org ;
-echo "$MY_AUTO_LOGIN" | sudo tee /etc/sddm.conf ;
+#MY_AUTO_LOGIN=$(cat<<TEXT
+#[Autologin]
+#Session=ubuntu.desktop
+#User=$USER
+#TEXT
+#)
+#sudo cp /etc/sddm.conf /etc/sddm.conf.org ;
+#echo "$MY_AUTO_LOGIN" | sudo tee /etc/sddm.conf ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # grup install old

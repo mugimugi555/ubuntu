@@ -22,6 +22,7 @@ sudo apt upgrade -y ;
 #
 #-----------------------------------------------------------------------------------------------------------------------
 sudo apt install -y openssh-server ;
+set shared/default-x-display-manager sddm | debconf-communicate ;
 sudo apt install -y ubuntu-desktop ;
 sudo dpkg-reconfigure sddm ;
 

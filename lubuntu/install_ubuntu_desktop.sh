@@ -14,6 +14,7 @@ echo 'Defaults timestamp_timeout = 1200' | sudo EDITOR='tee -a' visudo ;
 #-----------------------------------------------------------------------------------------------------------------------
 # install ubuntu desktop
 #-----------------------------------------------------------------------------------------------------------------------
+sudo apt-add-repository non-free -r ;
 sudo apt update ;
 sudo apt upgrade -y ;
 

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/onkyo/install_ubuntu_desktop.sh && bash install_ubuntu_desktop.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/lubuntu/install_ubuntu_desktop.sh && bash install_ubuntu_desktop.sh ;
 
 # lubuntu -> ubuntu desktop
 

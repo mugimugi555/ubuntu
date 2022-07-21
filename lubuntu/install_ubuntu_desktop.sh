@@ -23,6 +23,7 @@ sudo apt upgrade -y ;
 #-----------------------------------------------------------------------------------------------------------------------
 sudo apt install -y openssh-server ;
 sudo apt install -y ubuntu-desktop ;
+sudo dpkg-reconfigure sddm ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # update boot nomodeset mode
@@ -33,14 +34,14 @@ sudo update-grub2 ;
 #-----------------------------------------------------------------------------------------------------------------------
 # auto login on sddm
 #-----------------------------------------------------------------------------------------------------------------------
-#MY_AUTO_LOGIN=$(cat<<TEXT
-#[Autologin]
-#Session=ubuntu.desktop
-#User=$USER
-#TEXT
-#)
-#sudo cp /etc/sddm.conf /etc/sddm.conf.org ;
-#echo "$MY_AUTO_LOGIN" | sudo tee /etc/sddm.conf ;
+MY_AUTO_LOGIN=$(cat<<TEXT
+[Autologin]
+Session=ubuntu.desktop
+User=$USER
+TEXT
+)
+sudo cp /etc/sddm.conf /etc/sddm.conf.org ;
+echo "$MY_AUTO_LOGIN" | sudo tee /etc/sddm.conf ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # grup install old

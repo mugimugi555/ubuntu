@@ -3,6 +3,11 @@
 # not tested !!
 
 sudo echo ;
+
+#
+sudo swapoff -a 
+
+#
 sudo fallocate -l 64G /swapfile ;
 sudo chmod 600 /swapfile ;
 sudo mkswap /swapfile ;

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# not tested !!
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_swapfile.sh && bash install_swapfile.sh ;
 
 sudo echo ;
 

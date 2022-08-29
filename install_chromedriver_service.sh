@@ -13,11 +13,6 @@ sudo npm install pm2 -g ;
 
 # add services
 pm2 start "/home/$USER/chromedrivers/chromedriver     --port=5001" --name=chromedriver_latest_5001 ;
-#pm2 start "/home/$USER/chromedrivers/chromedriver_97  --port=5097" --name=chromedriver_97_5097     ;
-#pm2 start "/home/$USER/chromedrivers/chromedriver_98  --port=5098" --name=chromedriver_98_5098     ;
-#pm2 start "/home/$USER/chromedrivers/chromedriver_99  --port=5099" --name=chromedriver_99_5099     ;
-#pm2 start "/home/$USER/chromedrivers/chromedriver_109 --port=5100" --name=chromedriver_200_5100    ;
-
 pm2 save ;
 
 # auto start at logon
@@ -26,10 +21,4 @@ sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 start
 
 pm2 status ;
 
-#xdg-open http://localhost:5089 &
-#xdg-open http://localhost:5090 &
-#xdg-open http://localhost:5091 &
-
-#echo "http://localhost:5089";
-#echo "http://localhost:5090";
-#echo "http://localhost:5091";
+xdg-open http://localhost:5001 &

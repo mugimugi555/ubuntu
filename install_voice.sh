@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/raspberrypi/main/install_voice.sh && bash install_voice.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_voice.sh && bash install_voice.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # install voice app

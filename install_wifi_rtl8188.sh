@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_wifi_ rtl8188.sh && bash install_wifi_ rtl8188.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_wifi_rtl8188.sh && bash install_wifi_ rtl8188.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # install rtl8188 driver

@@ -37,14 +37,6 @@ rw=randread
 bs=512k
 rw=randwrite
 
-[Rand-Read-4K]
-bs=4k
-rw=randread
-
-[Rand-Write-4K]
-bs=4k
-rw=randwrite
-
 [Rand-Read-4K-QD32]
 iodepth=32
 bs=4k
@@ -52,6 +44,14 @@ rw=randread
 
 [Rand-Write-4K-QD32]
 iodepth=32
+bs=4k
+rw=randwrite
+
+[Rand-Read-4K]
+bs=4k
+rw=randread
+
+[Rand-Write-4K]
 bs=4k
 rw=randwrite
 TEXT

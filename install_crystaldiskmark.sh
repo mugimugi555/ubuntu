@@ -18,7 +18,7 @@ iodepth=1
 size=100m
 direct=1
 runtime=60
-directory=${TARGET}
+directory=/tmp
 stonewall
 
 [Seq-Read]
@@ -61,4 +61,4 @@ echo "$FIO_TEMPLATE" > ~/fio.txt ;
 #-----------------------------------------------------------------------------------------------------------------------
 # do benchmark
 #-----------------------------------------------------------------------------------------------------------------------
-TARGET=/tmp fio -f ~/fio.txt --output-format=terse | awk -F ';' '{print $3, ($7+$48) / 1000}' ;
+fio -f ~/fio.txt --output-format=terse | awk -F ';' '{print $3, ($7+$48) / 1000}' ;

@@ -39,3 +39,5 @@ LOCAL_IPADDRESS=`hostname -I | awk -F" " '{print $1}'` ;
 echo "======================================" ;
 echo "visit => http://$LOCAL_IPADDRESS/" ;
 echo "======================================" ;
+
+xdg-open http://$LOCAL_IPADDRESS/ &

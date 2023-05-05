@@ -1,6 +1,5 @@
 #/usr/bin/bash
 
-
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_composer.sh && bash install_composer.sh ;
 
 #-----------------------------------------------------------------------------------------------------------------------

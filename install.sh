@@ -50,8 +50,12 @@ sudo apt install -y emacs-nox htop curl git axel samba openssh-server net-tools 
 sudo apt autoremove -y ;
 
 # kdiskmark
-sudo snap install kdiskmark
-sudo snap connect kdiskmark:removable-media # external storages
+sudo snap install kdiskmark ;
+sudo snap connect kdiskmark:removable-media ;
+
+# losslesscut
+sudo snap install losslesscut ;
+sudo snap connect losslesscut:removable-media ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # vscode & gimp

@@ -49,6 +49,10 @@ sudo apt upgrade -y ;
 sudo apt install -y emacs-nox htop curl git axel samba openssh-server net-tools exfat-fuse ffmpeg ibus-mozc imagemagick lame unar vlc ;
 sudo apt autoremove -y ;
 
+# kdiskmark
+sudo snap install kdiskmark
+sudo snap connect kdiskmark:removable-media # external storages
+
 #-----------------------------------------------------------------------------------------------------------------------
 # vscode & gimp
 #-----------------------------------------------------------------------------------------------------------------------

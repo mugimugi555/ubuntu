@@ -9,6 +9,7 @@
 #wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 
 # install pm2 service
+sudo apt install -y npm ;
 sudo npm install pm2 -g ;
 
 # add services

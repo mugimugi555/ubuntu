@@ -2,6 +2,8 @@
 
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_chromedriver.php && php install_chromedriver.php ;
 
+# if you want latest version -> https://googlechromelabs.github.io/chrome-for-testing/#stable
+
 echo "=================================\n";
 echo "start check chrome driver version\n\n";
 

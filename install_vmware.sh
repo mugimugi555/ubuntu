@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_vmware.sh && bash install_vmware.sh ;
+# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_vmware.sh && bash install_vmware.sh ;
 
 sudo apt install -y gcc ;
 sudo apt install -y build-essential ;

@@ -14,7 +14,9 @@ cd ;
 wget https://github.com/mkubecek/vmware-host-modules/archive/workstation-17.0.2.tar.gz ;
 tar -xzf workstation-17.0.2.tar.gz ;
 cd vmware-host-modules-workstation-17.0.2 ;
-make ;
-sudo make install ;
+tar -cf vmmon.tar vmmon-only ;
+tar -cf vmnet.tar vmnet-only ;
+cp -v vmmon.tar vmnet.tar /usr/lib/vmware/modules/source/ ;
+vmware-modconfig --console --install-all ;
 
-vmplayer & ;
+vmplayer &

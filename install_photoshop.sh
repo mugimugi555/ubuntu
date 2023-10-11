@@ -29,6 +29,7 @@ wine --version ;
 #-----------------------------------------------------------------------------------------------------------------------
 cd ;
 git clone https://github.com/YoungFellow-le/photoshop-22-linux.git ;
+cd photoshop-22-linux ;
 ./main-menu.sh ;
 winetricks cjkfonts ;
 

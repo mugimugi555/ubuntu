@@ -170,6 +170,7 @@ sudo echo "$MYKEYBOARD" | sudo tee /usr/share/ibus/component/mozc.xml ;
 MYALIAS=$(cat<<TEXT
 alias a="axel -a -n 10"
 alias u='unar'
+alias up='sudo echo && sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y ;'
 TEXT
 )
 echo "$MYALIAS" >> ~/.bashrc ;

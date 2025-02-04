@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # インストール用の環境変数
-INSTALLER_PATH="$HOME/Downloads/Adobe CS5/Set-up.exe"
-WINEPREFIX="$HOME/.wine-cs5"
+INSTALLER_PATH="$HOME/Downloads/Adobe CS6/Set-up.exe"
+WINEPREFIX="$HOME/.winecs6"
 #WINEARCH="win32"
 WINEARCH="win64"
 
@@ -40,7 +40,6 @@ winecfg
 echo "📌 Adobe CS5 に必要なランタイムをインストール..."
 printf 'Y\n' | sudo winetricks --self-update
 winetricks cjkfonts corefonts fakejapanese meiryo
-winetricks vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 WINEDEBUG=-all winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 
 # インストールファイルの存在チェック

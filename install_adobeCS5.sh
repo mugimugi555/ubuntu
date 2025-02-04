@@ -41,6 +41,15 @@ echo "📌 Adobe CS5 に必要なランタイムをインストール..."
 printf 'Y\n' | sudo winetricks --self-update
 winetricks cjkfonts corefonts fakejapanese meiryo
 WINEDEBUG=-all winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
+cat <<EOF > wine-font-fix.reg
+[HKEY_CURRENT_USER\Software\Wine\Fonts\Replacements]
+"MS Shell Dlg"="MS Gothic"
+"MS Shell Dlg 2"="MS Gothic"
+EOF
+wine regedit wine-font-fix.reg
+fc-cache -fv
+wineboot -r
+wineserver -k && wineboot
 
 # インストールファイルの存在チェック
 if [ ! -f "$INSTALLER_PATH" ]; then

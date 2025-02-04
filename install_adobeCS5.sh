@@ -42,12 +42,32 @@ winetricks cjkfonts corefonts fakejapanese meiryo
 WINEDEBUG=-all winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 
 # フォント設定
-cat <<EOF > wine-font-fix.reg
+cat <<EOF > wine-fonts-utf8.reg
+Windows Registry Editor Version 5.00
+
 [HKEY_CURRENT_USER\Software\Wine\Fonts\Replacements]
-"MS Shell Dlg"="MS Gothic"
-"MS Shell Dlg 2"="MS Gothic"
+"Meiryo UI"="Meiryo"
+"Meiryo"="Meiryo"
+"MS Gothic"="MS Gothic"
+"MS Mincho"="MS Mincho"
+"MS PGothic"="MS PGothic"
+"MS PMincho"="MS PMincho"
+"MS Sans Serif"="Tahoma"
+"MS Shell Dlg"="MS UI Gothic"
+"MS UI Gothic"="MS UI Gothic"
+"ＭＳ Ｐゴシック"="MS PGothic"
+"ＭＳ Ｐ明朝"="MS PMincho"
+"ＭＳ ゴシック"="MS Gothic"
+"ＭＳ 明朝"="MS Mincho"
+"Tahoma"="Tahoma"
+
+[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
+"ClientSideWithRender"="N"
+"InputStyle"="root"
 EOF
-wine regedit wine-font-fix.reg
+
+iconv -f UTF-8 -t UTF-16LE wine-fonts-utf8.reg > wine-fonts.reg
+wine regedit wine-fonts.reg
 fc-cache -fv
 wineboot -r
 wineserver -k && wineboot

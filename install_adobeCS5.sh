@@ -33,7 +33,7 @@ wine --version
 echo "📌 Wine $WINEARCH 環境をセットアップ..."
 export WINEPREFIX=$WINEPREFIX
 export WINEARCH=$WINEARCH
-winecfg
+winetricks -q settings win7
 
 # 必要なランタイムをインストール
 echo "📌 Adobe $CS_VERSION に必要なランタイムをインストール..."

@@ -84,13 +84,22 @@ echo "📌 Adobe $CS_VERSION のインストーラーを起動します..."
 wine "$INSTALLER_PATH"
 
 # インストール後の実行ファイルのパスを取得
-ADOBE_DIR="$WINEPREFIX/drive_c/Program Files/Adobe"
+if [[ "$WINEARCH" == "win64" ]]; then
+    ADOBE_DIR="$WINEPREFIX/drive_c/Program Files"
+else
+    ADOBE_DIR="$WINEPREFIX/drive_c/Program Files (x86)"
+fi
+
 declare -A adobe_apps=(
     ["photoshop"]="Adobe Photoshop $CS_VERSION/Photoshop.exe"
     ["illustrator"]="Adobe Illustrator $CS_VERSION/Support Files/Contents/Windows/Illustrator.exe"
     ["premiere"]="Adobe Premiere Pro $CS_VERSION/Adobe Premiere Pro.exe"
     ["aftereffects"]="Adobe After Effects $CS_VERSION/Support Files/AfterFX.exe"
 )
+
+if [[ "$WINEARCH" == "win64" ]]; then
+    adobe_apps["photoshop"]="Adobe Photoshop $CS_VERSION (64 Bit)/Photoshop.exe"
+fi
 
 # 各アプリケーションのエイリアスを作成
 for app in "${!adobe_apps[@]}"; do

@@ -27,19 +27,19 @@ sudo apt install -y winetricks libfaudio0:i386 libgd3 libgd3:i386
 
 # Wine のバージョン確認
 echo "✅ Wine のバージョン:"
-wine --version
+WINEPREFIX=$WINEPREFIX wine --version
 
 # Wine 環境の作成
 echo "📌 Wine $WINEARCH 環境をセットアップ..."
 export WINEPREFIX=$WINEPREFIX
 export WINEARCH=$WINEARCH
-winetricks -q settings win7
+WINEPREFIX=$WINEPREFIX winetricks -q settings win7
 
 # 必要なランタイムをインストール
 echo "📌 Adobe $CS_VERSION に必要なランタイムをインストール..."
-printf 'Y\n' | sudo winetricks --self-update
-winetricks cjkfonts corefonts fakejapanese meiryo
-WINEDEBUG=-all winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
+printf 'Y\n' | sudo WINEPREFIX=$WINEPREFIX winetricks --self-update
+WINEPREFIX=$WINEPREFIX winetricks cjkfonts corefonts fakejapanese meiryo
+WINEDEBUG=-all WINEPREFIX=$WINEPREFIX winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 
 # フォント設定
 cat <<EOF > wine-fonts-utf8.reg
@@ -67,10 +67,10 @@ Windows Registry Editor Version 5.00
 EOF
 
 iconv -f UTF-8 -t UTF-16LE wine-fonts-utf8.reg > wine-fonts.reg
-wine regedit wine-fonts.reg
-fc-cache -fv
-wineboot -r
-wineserver -k && wineboot
+WINEPREFIX=$WINEPREFIX wine regedit wine-fonts.reg
+WINEPREFIX=$WINEPREFIX fc-cache -fv
+WINEPREFIX=$WINEPREFIX wineboot -r
+wineserver -k && WINEPREFIX=$WINEPREFIX wineboot
 
 # インストールファイルの存在チェック
 if [ ! -f "$INSTALLER_PATH" ]; then
@@ -81,7 +81,7 @@ fi
 
 # Adobe のインストール
 echo "📌 Adobe $CS_VERSION のインストーラーを起動します..."
-wine "$INSTALLER_PATH"
+WINEPREFIX=$WINEPREFIX wine "$INSTALLER_PATH"
 
 # インストール後の実行ファイルのパスを取得
 if [[ "$WINEARCH" == "win64" ]]; then

@@ -3,7 +3,7 @@
 # CS4/CS5/CS6 すべてに対応するインストールスクリプト
 
 # インストール用の環境変数
-CS_VERSION="CS6"  # CS4, CS5, CS6 を選択
+CS_VERSION="CS5"  # CS4, CS5, CS6 を選択
 INSTALLER_PATH="$HOME/Downloads/Adobe $CS_VERSION/Set-up.exe"
 WINEPREFIX="$HOME/.wine$CS_VERSION"
 WINEARCH="win64"  # 32bit 環境なら "win32"

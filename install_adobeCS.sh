@@ -7,6 +7,7 @@ CS_VERSION="CS5"  # CS4, CS5, CS6 を選択
 INSTALLER_PATH="$HOME/Downloads/Adobe $CS_VERSION/Set-up.exe"
 WINEPREFIX="$HOME/.wine$CS_VERSION"
 WINEARCH="win64"  # 32bit 環境なら "win32"
+SERIAL_NUMBER="1234-5678-9012-3456-7890-1234"  # シリアル番号を指定
 
 # 既存の Wine を削除
 echo "📌 既存の Wine を削除中..."
@@ -41,36 +42,20 @@ printf 'Y\n' | sudo WINEPREFIX=$WINEPREFIX winetricks --self-update
 WINEPREFIX=$WINEPREFIX winetricks cjkfonts corefonts fakejapanese meiryo
 WINEDEBUG=-all WINEPREFIX=$WINEPREFIX winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 
-# フォント設定
-cat <<EOF > wine-fonts-utf8.reg
-Windows Registry Editor Version 5.00
-
-[HKEY_CURRENT_USER\Software\Wine\Fonts\Replacements]
-"Meiryo UI"="Meiryo"
-"Meiryo"="Meiryo"
-"MS Gothic"="MS Gothic"
-"MS Mincho"="MS Mincho"
-"MS PGothic"="MS PGothic"
-"MS PMincho"="MS PMincho"
-"MS Sans Serif"="Tahoma"
-"MS Shell Dlg"="MS UI Gothic"
-"MS UI Gothic"="MS UI Gothic"
-"ＭＳ Ｐゴシック"="MS PGothic"
-"ＭＳ Ｐ明朝"="MS PMincho"
-"ＭＳ ゴシック"="MS Gothic"
-"ＭＳ 明朝"="MS Mincho"
-"Tahoma"="Tahoma"
-
-[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
-"ClientSideWithRender"="N"
-"InputStyle"="root"
+# setup.xml の作成（シリアル番号が定義されている場合のみ）
+if [[ -n "$SERIAL_NUMBER" ]]; then
+    cat <<EOF > setup.xml
+<?xml version="1.0" encoding="utf-8"?>
+<Deployment>
+    <Properties>
+        <Property name="SERIALNUMBER">$SERIAL_NUMBER</Property>
+        <Property name="EULADISPLAY">0</Property>
+        <Property name="REGISTRATION">Suppress</Property>
+        <Property name="LAUNCHAFTER">NO</Property>
+    </Properties>
+</Deployment>
 EOF
-
-iconv -f UTF-8 -t UTF-16LE wine-fonts-utf8.reg > wine-fonts.reg
-WINEPREFIX=$WINEPREFIX wine regedit wine-fonts.reg
-WINEPREFIX=$WINEPREFIX fc-cache -fv
-WINEPREFIX=$WINEPREFIX wineboot -r
-wineserver -k && WINEPREFIX=$WINEPREFIX wineboot
+fi
 
 # インストールファイルの存在チェック
 if [ ! -f "$INSTALLER_PATH" ]; then
@@ -81,7 +66,11 @@ fi
 
 # Adobe のインストール
 echo "📌 Adobe $CS_VERSION のインストーラーを起動します..."
-WINEPREFIX=$WINEPREFIX wine "$INSTALLER_PATH"
+if [[ -n "$SERIAL_NUMBER" ]]; then
+    WINEPREFIX=$WINEPREFIX wine "$INSTALLER_PATH" --silent --deploymentFile=setup.xml
+else
+    WINEPREFIX=$WINEPREFIX wine "$INSTALLER_PATH"
+fi
 
 # インストール後の実行ファイルのパスを取得
 if [[ "$WINEARCH" == "win64" ]]; then

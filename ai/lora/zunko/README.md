@@ -1,7 +1,6 @@
-
 ## 画像の準備
 
-ここに  
+zunkoに  
 [学習用画像データ](https://drive.google.com/drive/folders/1oyR1-1H64l7Veyb5ybYUB0K9FTz7j5NN)  
 からダウンロードした画像を配置します。
 

@@ -1,4 +1,4 @@
-## 一括でフォルダを作成する方法（Linux/macOS）
+## 一括でLORA学習する方法
 
 ## 画像の準備
 
@@ -17,7 +17,7 @@ batch_dir/
   └── zunko/"*.jpg
 ```
 
-一括でloraファイルの作成
+一括でLORA学習する
 
 ```bash
 bash batch_train_lora.sh

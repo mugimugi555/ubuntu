@@ -8,15 +8,15 @@
 # ✅ 引数で画像フォルダを指定（デフォルトは "zunko"）
 SOURCE_FOLDER=${1:-"zunko"}  # 変換元フォルダ
 
-# ✅ 固定設定
-TARGET_FOLDER="dataset"  # 変換後の保存先
-VENV_DIR="venv-lora"     # 仮想環境ディレクトリ
-IMAGE_SIZE=256           # 画像のサイズ (縦横共通)
-EPOCHS=10                # エポック数
-BATCH_SIZE=1             # バッチサイズ
-
 # ✅ LoRA モデルの出力フォルダ (キャラ名に基づく)
 OUTPUT_DIR="output_loras"  # LoRA モデルの出力フォルダ
+
+# ✅ 固定設定
+TARGET_FOLDER="working_dataset" # 正規化画像とタグの保存先
+VENV_DIR="venv-lora"            # 仮想環境ディレクトリ
+IMAGE_SIZE=256                  # 画像のサイズ (縦横共通)
+EPOCHS=10                       # エポック数
+BATCH_SIZE=1                    # バッチサイズ
 
 # =====================
 # 環境のセットアップ

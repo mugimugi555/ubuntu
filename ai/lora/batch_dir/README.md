@@ -1,7 +1,10 @@
+## 一括でフォルダを作成する方法（Linux/macOS）
+
 ここに
 https://drive.google.com/drive/folders/1oyR1-1H64l7Veyb5ybYUB0K9FTz7j5NN
 からダウンロードしたファイルを
 
+```
 batch_dir/
   ├── itako/*.jpg
   ├── kiritan/*.jpg
@@ -10,5 +13,8 @@ batch_dir/
   ├── usagi/*.jpg
   ├── zundamon/*.jpg
   └── zunko/"*.jpg
+```
 
+```bash
 として、一括で作成したい画像を用意します。
+```

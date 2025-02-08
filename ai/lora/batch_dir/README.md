@@ -1,6 +1,6 @@
 ## 一括でLORA学習する方法
 
-## 画像の準備
+### 画像の準備
 
 batch_dirに
 [学習用画像データ](https://drive.google.com/drive/folders/1oyR1-1H64l7Veyb5ybYUB0K9FTz7j5NN)  
@@ -17,7 +17,7 @@ batch_dir/
   └── zunko/"*.jpg
 ```
 
-一括でLORA学習する
+### 一括でLORA学習する
 
 ```bash
 bash batch_train_lora.sh

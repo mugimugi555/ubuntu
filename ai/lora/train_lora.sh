@@ -148,9 +148,19 @@ run_training() {
     --train_batch_size=$BATCH_SIZE    \
     --max_train_epochs=$EPOCHS        \
     --learning_rate=5e-6              \
-    --network_module=networks.lora
+    --network_module=networks.lora    \
+    --caption_extension caption
 
   echo "✅ 学習完了！モデルは $OUTPUT_DIR に保存されました。"
+}
+
+# =====================
+# 後処理 (dataset の削除)
+# =====================
+cleanup() {
+  echo "🗑️ データセットを削除中..."
+  rm -rf "$TARGET_FOLDER"
+  echo "✅ データセットの削除が完了しました！"
 }
 
 # =====================
@@ -160,9 +170,10 @@ main() {
   setup_environment
   setup_deepdanbooru
   setup_directory
-  generate_captions  # **リサイズ前にキャプション生成**
-  process_images     # **リサイズ後にキャプション変換**
+  generate_captions
+  process_images
   run_training
+  cleanup
   deactivate
 }
 

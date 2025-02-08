@@ -6,13 +6,13 @@ batch_dirに [学習用画像データ](https://drive.google.com/drive/folders/1
 
 ```
 batch_dir/
-  ├── itako/*.jpg
-  ├── kiritan/*.jpg
-  ├── metan/*.jpg
-  ├── sora/*.jpg
-  ├── usagi/*.jpg
-  ├── zundamon/*.jpg
-  └── zunko/"*.jpg
+  ├── itako/*.png
+  ├── kiritan/*.png
+  ├── metan/*.png
+  ├── sora/*.png
+  ├── usagi/*.png
+  ├── zundamon/*.png
+  └── zunko/*.png
 ```
 
 ### 一括でLORA学習をする

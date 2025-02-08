@@ -6,12 +6,12 @@
 # ============================
 
 # 設定
-VENV_DIR="venv-lora"  # 仮想環境ディレクトリ
-BASE_DIR="dataset"  # 学習データのベースディレクトリ
-OUTPUT_DIR="output_lora_model"  # 出力ディレクトリ
-IMAGE_SIZE=256  # 画像のサイズ (縦横共通)
-EPOCHS=10  # エポック数
-BATCH_SIZE=1  # バッチサイズ
+VENV_DIR="venv-lora"      # 仮想環境ディレクトリ
+BASE_DIR="dataset"        # 学習データのベースディレクトリ
+OUTPUT_DIR="output_lora"  # 出力ディレクトリ
+IMAGE_SIZE=256            # 画像のサイズ (縦横共通)
+EPOCHS=10                 # エポック数
+BATCH_SIZE=1              # バッチサイズ
 
 # =====================
 # 環境のセットアップ

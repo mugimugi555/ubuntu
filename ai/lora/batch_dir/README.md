@@ -17,5 +17,5 @@ batch_dir/
 として、一括で作成したい画像を用意します。
 
 ```bash
-
+bash batch_train_lora.sh
 ```

@@ -78,32 +78,6 @@ output_loras/
 
    - 学習完了後、`dataset/1_<フォルダ名>` および `dataset/` を削除
 
-## スクリプトの主な処理
-
-### 1. キャプション生成 (`generate_captions`)
-
-- 画像ごとに DeepDanbooru を使い `.caption.json` を生成
-- `.caption.json` が既にある場合はスキップ
-- スコア順にタグを並び替え、最も関連性の高いタグを選定
-
-### 2. 画像のリサイズ & 名前統一 (`process_images`)
-
-- 画像をリサイズして `dataset/1_<フォルダ名>/0001.png` のように変換
-- `.caption.json` を `.caption` ファイルに変換し、タグを保存
-- タグには**学習フォルダ名が最初に追加**される
-
-### 3. LoRA 学習 (`run_training`)
-
-- `stable-diffusion-v1-5` を基に LoRA の学習を実行
-- `accelerate launch` を使用し、GPU最適化
-- 出力は `output_loras/` に保存
-- `.caption` ファイルは自動で学習データとして使用される
-
-### 4. クリーンアップ (`cleanup`)
-
-- 学習完了後、`dataset/1_<フォルダ名>` および `dataset/` を削除
-- 必要に応じて `echo` で削除前に確認可能
-
 ## 注意事項
 
 - `DeepDanbooru` のモデルを初回実行時にダウンロードするため、ネットワーク接続が必要です。

@@ -1,8 +1,8 @@
 ## 一括でフォルダを作成する方法（Linux/macOS）
 
-ここに
+batch_dirに
 https://drive.google.com/drive/folders/1oyR1-1H64l7Veyb5ybYUB0K9FTz7j5NN
-からダウンロードしたファイルを
+からダウンロードしたファイルを、フォルダ付きで画像を配置します。
 
 ```
 batch_dir/
@@ -14,7 +14,8 @@ batch_dir/
   ├── zundamon/*.jpg
   └── zunko/"*.jpg
 ```
-として、一括で作成したい画像を用意します。
+
+一括でloraファイルの作成
 
 ```bash
 bash batch_train_lora.sh

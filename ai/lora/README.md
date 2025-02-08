@@ -77,13 +77,6 @@ output_loras/
 5. **クリーンアップ (****`cleanup`****)**
 
    - 学習完了後、`dataset/1_<フォルダ名>` および `dataset/` を削除
-   - 必要に応じて `echo` で削除前に確認可能
-
-```bash
-mkdir -p deepdanbooru
-wget https://github.com/KichangKim/DeepDanbooru/releases/download/v3-20211112-sgd-e28/deepdanbooru-v3-20211112-sgd-e28.zip -O deepdanbooru/latest.zip
-unzip -o deepdanbooru/latest.zip -d deepdanbooru/
-```
 
 ## スクリプトの主な処理
 

@@ -10,7 +10,6 @@
 - **画像のリサイズ & 名前の統一**: LoRA学習用のデータセットを整理
 - **LoRA モデルの学習**: 学習データを使ってLoRAをトレーニング
 - **学習完了後のデータクリーンアップ**: `working_dataset/` を削除してクリーンな状態に戻す
-- **バッチ処理による複数フォルダの学習**: `batch_train_lora.sh` で複数のフォルダを自動学習
 
 ## 動作環境
 
@@ -45,16 +44,6 @@ bash train_lora.sh zunko
 ```bash
 output_loras/
 ```
-
-### 4. バッチ処理で複数フォルダを学習
-
-複数のフォルダを順番に学習させるには、batch_train_lora.sh を使用します。
-
-```bash
-bash batch_train_lora.sh
-```
-
-これにより、itako, kiritan, metan, sora, usagi, zundamon, zunko などのフォルダが順番に処理されます。
 
 ## スクリプトの詳細
 

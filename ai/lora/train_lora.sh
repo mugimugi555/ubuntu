@@ -2,11 +2,11 @@
 
 # ============================
 # LoRA Training Shell Script
-# venvで環境管理 + 画像リサイズ + LoRA学習 (日本ミラー & 並列ダウンロード対応)
+# venvで環境管理 + 画像リサイズ + キャプション生成 + LoRA学習
 # ============================
 
-# ✅ 外部変数 (環境変数やスクリプト引数から設定可能)
-SOURCE_FOLDER="zunko"    # 変換元フォルダ (デフォルト: zunko)
+# ✅ 引数で画像フォルダを指定（デフォルトは "zunko"）
+SOURCE_FOLDER=${1:-"zunko"}  # 変換元フォルダ
 
 # ✅ 固定設定
 TARGET_FOLDER="dataset"  # 変換後の保存先
@@ -23,7 +23,7 @@ OUTPUT_DIR="output_loras"  # LoRA モデルの出力フォルダ
 # =====================
 setup_environment() {
   echo "🔹 システムパッケージをチェック..."
-  sudo apt update && sudo apt install -y python3 python3-venv python3-pip git imagemagick pipx
+  sudo apt update && sudo apt install -y python3 python3-venv python3-pip git imagemagick pipx wget jq
 
   echo "🔹 仮想環境をセットアップ: $VENV_DIR"
   if [ ! -d "$VENV_DIR" ]; then
@@ -31,97 +31,102 @@ setup_environment() {
   fi
   source "$VENV_DIR/bin/activate"
 
-  #
-  env PIP_INDEX_URL="https://pypi.ngc.nvidia.com/simple"
+  echo "🔹 必要なライブラリをインストール..."
   pip install --upgrade pip
   pip install \
       "numpy<1.25.0" scipy torch torchvision torchaudio tensorboard \
-      tensorflow "accelerate>=0.26.0" transformers datasets matplotlib imagesize
+      tensorflow tensorflow_io "accelerate>=0.26.0" transformers datasets matplotlib imagesize deepdanbooru
 
   echo "✅ 仮想環境のセットアップ完了！"
 }
 
 # =====================
-# 事前学習済みモデルの取得
+# DeepDanbooru のセットアップ
 # =====================
-download_pretrained_model() {
-  if [ ! -d "stable-diffusion-v1-5" ]; then
-    echo "🔹 事前学習済みモデルが見つかりません。Hugging Face からダウンロードします..."
-    git clone https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5
-  else
-    echo "✅ 事前学習済みモデルが既に存在します。"
-  fi
-}
+setup_deepdanbooru() {
+  echo "🔹 DeepDanbooru モデルのセットアップ..."
+  mkdir -p deepdanbooru
 
-# =====================
-# 学習スクリプトの取得
-# =====================
-setup_training_repo() {
-  if [ ! -d "sd-scripts" ]; then
-    echo "🔹 Kohya’s SS スクリプトが見つかりません。GitHubからクローンします..."
-    git clone https://github.com/kohya-ss/sd-scripts.git
-  else
-    echo "✅ 学習スクリプトは既に存在します。最新の状態に更新します..."
-    cd "sd-scripts" && git pull && cd ..
+  if [ ! -f "deepdanbooru/model-resnet_custom_v3.h5" ]; then
+    wget https://github.com/KichangKim/DeepDanbooru/releases/download/v3-20211112-sgd-e28/deepdanbooru-v3-20211112-sgd-e28.zip -O deepdanbooru/latest.zip
+    unzip -o deepdanbooru/latest.zip -d deepdanbooru/
   fi
 
-  echo "🔹 sd-scripts の依存パッケージをインストール中..."
-  cd sd-scripts
-  uv pip install -r requirements.txt
-  cd ..
-  echo "✅ sd-scripts の依存パッケージをインストール完了！"
+  echo "✅ DeepDanbooru のセットアップ完了！"
 }
 
 # =====================
 # データセットのセットアップ
 # =====================
 setup_directory() {
-  if [ ! -d "$OUTPUT_DIR" ]; then
-    echo "⚠ LORA出力用ディレクトリが見つかりません: $OUTPUT_DIR"
-    echo "🔹 ディレクトリを作成します..."
-    mkdir -p "$OUTPUT_DIR"
-  fi
-  echo "✅ LORA出力用ディレクトリが準備されました: $OUTPUT_DIR"
-
-  if [ ! -d "$TARGET_FOLDER" ]; then
-    echo "⚠ データセットディレクトリが見つかりません: $TARGET_FOLDER"
-    echo "🔹 ディレクトリを作成します..."
-    mkdir -p "$TARGET_FOLDER"
-  fi
-  echo "✅ データセットディレクトリが準備されました: $TARGET_FOLDER"
+  mkdir -p "$OUTPUT_DIR"
+  mkdir -p "$TARGET_FOLDER"
 }
 
 # =====================
-# 画像の整理 (リサイズ・ファイル名統一・キャプション作成)
+# キャプションを生成 (DeepDanbooru を使用) - **リサイズ前**
+# =====================
+generate_captions() {
+  echo "🔹 DeepDanbooru でキャプションを生成中..."
+  for img in "$SOURCE_FOLDER"/*.{jpg,png}; do
+    if [ -f "$img" ]; then
+      caption_json_file="${img%.*}.caption.json"
+
+      # `.caption.json` が既にある場合はスキップ
+      if [ -f "$caption_json_file" ]; then
+        echo "⚠ キャプションが既に存在するためスキップ: $caption_json_file"
+        continue
+      fi
+
+      # キャプション生成 (警告抑制)
+      CUDA_VISIBLE_DEVICES=0 TF_CPP_MIN_LOG_LEVEL=3 python3 generate_captions.py "$img" 2>/dev/null
+
+      # JSON の解析に失敗した場合のチェック
+      if [ ! -s "$caption_json_file" ] || ! jq empty "$caption_json_file" > /dev/null 2>&1; then
+        echo "⚠ キャプション生成に失敗: $img"
+        rm -f "$caption_json_file"
+        continue
+      fi
+
+      echo "✅ キャプション作成: $caption_json_file"
+    fi
+  done
+  echo "✅ キャプションの生成が完了しました！"
+}
+
+# =====================
+# 画像の整理 (リサイズ・ファイル名統一 & キャプション変換)
 # =====================
 process_images() {
-  TARGET_PATH="$TARGET_FOLDER/1_$SOURCE_FOLDER"  # 出力先フォルダ
+  TARGET_PATH="$TARGET_FOLDER/1_$SOURCE_FOLDER"
 
-  # ✅ 既存のデータを削除 (フォルダ内のファイルを全削除)
-  if [ -d "$TARGET_PATH" ]; then
-    echo "⚠ $TARGET_PATH の中身をクリアします..."
-    rm -rf "$TARGET_PATH"/*
-  fi
-
-  # ✅ 出力先フォルダを作成
+  rm -rf "$TARGET_PATH"/*
   mkdir -p "$TARGET_PATH"
 
-  # ✅ 画像処理
   echo "🔹 画像をリサイズし、統一フォーマットでコピー中..."
   COUNT=1
   for img in "$SOURCE_FOLDER"/*.{jpg,png}; do
     if [ -f "$img" ]; then
-      NEW_NAME=$(printf "%04d.png" "$COUNT")  # 0001.png のように統一
+      NEW_NAME=$(printf "%04d.png" "$COUNT")
       NEW_PATH="$TARGET_PATH/$NEW_NAME"
 
-      # 画像をリサイズしてコピー
       mogrify -resize "${IMAGE_SIZE}x${IMAGE_SIZE}!" -path "$TARGET_PATH" "$img"
       mv "$TARGET_PATH/$(basename "$img")" "$NEW_PATH"
 
-      # キャプション作成
-      echo "$SOURCE_FOLDER" > "${NEW_PATH%.png}.caption"
+      # キャプションファイルの変換と移動
+      OLD_CAPTION_JSON="${img%.*}.caption.json"
+      NEW_CAPTION_FILE="${NEW_PATH%.png}.caption"
 
-      echo "✅ $NEW_NAME を作成 (キャプション: $SOURCE_FOLDER)"
+      if [ -f "$OLD_CAPTION_JSON" ]; then
+        # 学習ディレクトリ名をタグの最初に追加して `.caption` に保存（スコア順）
+        echo -n "$SOURCE_FOLDER, " > "$NEW_CAPTION_FILE"
+        jq -r 'to_entries | sort_by(-.value) | .[] | select(.value > 0.5) | .key' "$OLD_CAPTION_JSON" | paste -sd ", " - >> "$NEW_CAPTION_FILE"
+        echo "✅ キャプション変換: $NEW_CAPTION_FILE"
+      else
+        echo "⚠ キャプションが見つかりません: $OLD_CAPTION_JSON"
+      fi
+
+      echo "✅ 画像変換完了: $NEW_NAME"
       COUNT=$((COUNT + 1))
     fi
   done
@@ -129,21 +134,10 @@ process_images() {
 }
 
 # =====================
-# データセットのクリア (学習完了後に削除)
-# =====================
-clean_dataset() {
-  echo "🔹 学習完了！データセットフォルダを削除します..."
-  rm -rf "$TARGET_FOLDER"
-  echo "✅ データセットフォルダを削除しました: $TARGET_FOLDER"
-}
-
-# =====================
 # LoRA 学習の実行
 # =====================
 run_training() {
   echo "🔹 LoRA学習開始..."
-  export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"
-
   accelerate launch \
     --mixed_precision="bf16" "sd-scripts/train_network.py"  \
     --pretrained_model_name_or_path="stable-diffusion-v1-5" \
@@ -157,9 +151,6 @@ run_training() {
     --network_module=networks.lora
 
   echo "✅ 学習完了！モデルは $OUTPUT_DIR に保存されました。"
-
-  # ✅ 学習完了後にデータセットを削除
-  clean_dataset
 }
 
 # =====================
@@ -167,10 +158,10 @@ run_training() {
 # =====================
 main() {
   setup_environment
-  setup_training_repo
-  download_pretrained_model
+  setup_deepdanbooru
   setup_directory
-  process_images
+  generate_captions  # **リサイズ前にキャプション生成**
+  process_images     # **リサイズ後にキャプション変換**
   run_training
   deactivate
 }

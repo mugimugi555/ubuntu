@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== Emacs をビルドして Xeon Phi に転送 ==="
+echo "=== Emacs を静的リンクでビルド & Xeon Phi に転送 ==="
 
 # 必要なパッケージをホストPCにインストール
 sudo apt update
@@ -12,8 +12,8 @@ wget https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.gz
 tar xvf emacs-28.2.tar.gz
 cd emacs-28.2
 
-# Emacs をビルド
-./configure --prefix=/home/mic/emacs --without-x --without-sound
+# Emacs を静的リンクでビルド
+./configure --prefix=/home/mic/emacs --without-x --without-sound LDFLAGS="-static"
 make -j$(nproc)
 make install
 

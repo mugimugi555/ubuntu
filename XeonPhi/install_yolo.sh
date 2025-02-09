@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== Xeon Phi で OpenCV & YOLO を使用する準備 ==="
+echo "=== OpenCV & YOLO を静的リンクでビルド & Xeon Phi に転送 ==="
 
 ### 1️⃣ OpenCV のビルド（静的リンク） & 転送 ###
 echo "=== OpenCV を静的リンクでビルド & 転送 ==="
@@ -11,17 +11,22 @@ sudo apt install -y build-essential cmake g++ wget unzip \
                     libjpeg-dev libpng-dev libtiff-dev \
                     libavcodec-dev libavformat-dev libswscale-dev
 
+# 作業用フォルダの作成（ビルドは /tmp で実施）
+mkdir -p /tmp/opencv_build
+cd /tmp/opencv_build
+
 # OpenCV のソースコードを取得
-cd /tmp
 git clone https://github.com/opencv/opencv.git
 git clone https://github.com/opencv/opencv_contrib.git
 cd opencv
 
 # OpenCV を静的リンクでビルド
-mkdir -p build && cd build
+mkdir -p /tmp/opencv_build/opencv/build
+cd /tmp/opencv_build/opencv/build
+
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D CMAKE_INSTALL_PREFIX=/home/mic/opencv \
-      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+      -D CMAKE_INSTALL_PREFIX=$HOME/mic/bin/opencv \
+      -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_build/opencv_contrib/modules \
       -D ENABLE_CXX11=ON -D WITH_OPENMP=ON -D WITH_TBB=OFF \
       -D WITH_GTK=OFF -D WITH_QT=OFF -D BUILD_EXAMPLES=OFF \
       -D BUILD_opencv_apps=OFF -D BUILD_TESTS=OFF -D BUILD_DOCS=OFF \
@@ -29,16 +34,23 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
       -D ENABLE_NEON=OFF -D WITH_V4L=OFF -D WITH_OPENGL=OFF \
       -D WITH_FFMPEG=ON -D WITH_AVFOUNDATION=OFF \
       -D BUILD_SHARED_LIBS=OFF -D CMAKE_EXE_LINKER_FLAGS="-static" ..
+      
 make -j$(nproc)
 make install
 
 # OpenCV を Xeon Phi に転送
-scp -r /home/mic/opencv mic0:/home/mic/
+echo "=== OpenCV を Xeon Phi に転送 ==="
+scp -r $HOME/mic/bin/opencv mic0:/home/mic/bin/
 
 # 動作確認
-ssh mic0 "/home/mic/opencv/bin/opencv_version"
+ssh mic0 "/home/mic/bin/opencv/bin/opencv_version"
 
 echo "=== OpenCV のビルド & 転送完了 ==="
+
+# 作業ディレクトリの削除（オプション）
+rm -rf /tmp/opencv_build
+
+echo "=== ビルド用ファイルをクリーンアップしました ==="
 
 ---
 
@@ -76,7 +88,7 @@ echo "=== Xeon Phi で YOLO による物体検出を実行 ==="
 scp for_upload/yolo_detect.py mic0:/home/mic/
 
 # Xeon Phi で Python スクリプトを実行
-ssh mic0 "/home/mic/opencv/bin/python3 /home/mic/yolo_detect.py"
+ssh mic0 "/home/mic/bin/opencv/bin/python3 /home/mic/yolo_detect.py"
 
 ---
 

@@ -54,15 +54,19 @@ echo "=== ビルド用ファイルをクリーンアップしました ==="
 
 ---
 
-### 2️⃣ YOLO モデルのダウンロード & 転送 ###
-echo "=== YOLO モデルをセットアップ ==="
+### 2️⃣ YOLO モデルのダウンロード ###
+echo "=== YOLO モデルを Xeon Phi に直接ダウンロード ==="
 
-ssh mic0 "mkdir -p /home/mic/yolo"
-scp for_upload/yolov3.weights mic0:/home/mic/yolo/yolov3.weights
-scp for_upload/yolov3.cfg mic0:/home/mic/yolo/yolov3.cfg
-scp for_upload/coco.names mic0:/home/mic/yolo/coco.names
+# Xeon Phi でモデルのディレクトリを作成し、wget でダウンロード
+ssh mic0 << 'EOF'
+    mkdir -p /home/mic/yolo/models/
+    cd /home/mic/yolo/models/
+    wget -O yolov3.weights https://pjreddie.com/media/files/yolov3.weights
+    wget -O yolov3.cfg https://github.com/pjreddie/darknet/raw/master/cfg/yolov3.cfg
+    wget -O coco.names https://github.com/pjreddie/darknet/raw/master/data/coco.names
+EOF
 
-echo "=== YOLO モデルのセットアップ完了 ==="
+echo "=== YOLO モデルのダウンロード完了 ==="
 
 ---
 

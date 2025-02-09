@@ -9,10 +9,6 @@
 - [Ubuntu のセットアップ](#ubuntu-のセットアップ)
 - [必要なパッケージのインストール](#必要なパッケージのインストール)
 - [Xeon Phi の認識と設定](#xeon-phi-の認識と設定)
-- [Python のインストール](#python-のインストール)
-- [OpenCV のビルドとインストール](#opencv-のビルドとインストール)
-- [YOLO（物体検出）の実行](#yolo物体検出の実行)
-- [ImageMagick のセットアップと活用](#imagemagick-のセットアップと活用)
 
 ---
 
@@ -74,69 +70,6 @@ ls /dev/mic*
 ssh mic0 "echo 'Xeon Phi に正常に接続できます。'"
 ```
 ✅ **接続成功なら OK。失敗した場合は `mic0` の IP 設定を確認**
-
----
-
-## 📌 Python のインストール
-デフォルトの Python バージョンが古い場合は、**Python 3.9 をソースからビルド** してインストールします。
-
-```bash
-cd /tmp
-wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz
-tar xzf Python-3.9.17.tgz
-cd Python-3.9.17
-
-./configure --enable-optimizations
-make -j$(nproc)
-sudo make altinstall
-
-python3.9 --version
-```
-
----
-
-## 📌 OpenCV のビルドとインストール
-
-```bash
-cd ~
-git clone https://github.com/opencv/opencv.git
-git clone https://github.com/opencv/opencv_contrib.git
-cd opencv
-mkdir build
-cd build
-
-cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D CMAKE_INSTALL_PREFIX=/home/mic/opencv \
-      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
-      -D ENABLE_CXX11=ON \
-      -D WITH_OPENMP=ON \
-      -D BUILD_SHARED_LIBS=OFF \
-      -D CMAKE_EXE_LINKER_FLAGS="-static" ..
-make -j$(nproc)
-make install
-```
-
----
-
-## 📌 YOLO（物体検出）の実行
-Python のスクリプトは `for_upload/` ディレクトリに格納し、シェルスクリプトから実行することで再利用しやすくなります。
-
-```bash
-scp for_upload/yolo_detect.py mic0:/home/mic/
-ssh mic0 "python3 /home/mic/yolo_detect.py"
-```
-
----
-
-## 📌 ImageMagick のセットアップと活用
-ImageMagick を静的リンクでビルドし、動画から静止画に変換、エッジフィルタを適用します。
-
-```bash
-/home/mic/imagemagick/bin/magick convert /home/mic/downloaded_video.mp4 -scene 1 /home/mic/frame_%04d.png
-for file in /home/mic/frame_*.png; do
-    /home/mic/imagemagick/bin/magick convert "$file" -edge 1 "/home/mic/edge_$file"
-done
-```
 
 ---
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "=== Xeon Phi のシステム情報を取得 ==="
+echo "=== Xeon Phi のシステム情報を取得 & 必要なパッケージをインストール ==="
 
-# Xeon Phi が認識されているか確認
+### 1️⃣ Xeon Phi が Ubuntu に認識されているか確認 ###
 echo "=== Xeon Phi のデバイス確認 ==="
 if ! lspci | grep -i "co-processor"; then
     echo "⚠ Xeon Phi が認識されていません。PCIe 接続を確認してください。"
@@ -11,16 +11,36 @@ else
     echo "✅ Xeon Phi が認識されています。"
 fi
 
-# SSH ログインテスト
-echo "=== SSH ログインの確認 ==="
-if ssh mic0 "echo '✅ Xeon Phi に正常に接続できます。'"; then
-    echo "✅ SSH 接続に成功しました。"
+### 2️⃣ Xeon Phi 用のドライバがインストールされているか確認 ###
+echo "=== Xeon Phi のドライバ確認 ==="
+if ! dpkg -l | grep -q "intel-mic-kmod"; then
+    echo "⚠ Intel Xeon Phi ドライバがインストールされていません。インストールを実行します。"
+    sudo apt update
+    sudo apt install -y intel-mic-kmod intel-mic-tools
 else
-    echo "⚠ SSH 接続に失敗しました。Xeon Phi のネットワーク設定を確認してください。"
-    exit 1
+    echo "✅ Intel Xeon Phi ドライバは既にインストール済みです。"
 fi
 
-# Xeon Phi 上でシステム情報 & 開発ツールの確認
+### 3️⃣ mic0 デバイスが正しく作成されているか確認 ###
+echo "=== mic0 デバイスの確認 ==="
+if [ ! -e "/dev/mic0" ]; then
+    echo "⚠ /dev/mic0 が見つかりません。modprobe を実行します。"
+    sudo modprobe mic
+else
+    echo "✅ /dev/mic0 が正しく作成されています。"
+fi
+
+### 4️⃣ SSH 設定 & Xeon Phi への接続確認 ###
+echo "=== Xeon Phi のネットワーク接続を確認 ==="
+if ! ssh mic0 "echo '✅ Xeon Phi に正常に接続できます。'"; then
+    echo "⚠ SSH 接続に失敗しました。`mic0` の IP 設定を確認してください。"
+    exit 1
+else
+    echo "✅ Xeon Phi に正常に接続できます。"
+fi
+
+### 5️⃣ Xeon Phi の詳細情報を取得 ###
+echo "=== Xeon Phi の詳細情報を取得 ==="
 ssh mic0 << 'EOF'
     echo "=== CPU 情報 ==="
     cat /proc/cpuinfo | grep -E "model name|cpu cores|siblings" | uniq
@@ -92,4 +112,4 @@ ssh mic0 << 'EOF'
     command -v curl &> /dev/null && curl --version | head -n 1
 EOF
 
-echo "=== Xeon Phi の情報取得が完了しました！ ==="
+echo "=== Xeon Phi のセットアップ & 情報取得が完了しました！ ==="

@@ -4,40 +4,48 @@ echo "=== Xeon Phi に Node.js (静的リンク) をインストール ==="
 
 # バージョン指定
 NODE_VERSION="20.11.0"
-INSTALL_DIR="/home/mic/node-${NODE_VERSION}"
 
 # 必要なツールをインストール
 echo "=== 必要なツールをインストール（ホスト側） ==="
 sudo apt update
 sudo apt install -y build-essential python3 g++ make wget
 
-# 一時ディレクトリで作業
-cd /tmp
+### 1️⃣ ホスト側で Node.js のビルド & 転送 ###
+echo "=== ホスト側で Node.js ${NODE_VERSION} のビルド開始 ==="
 
-# Node.js のソースコードを取得
-echo "=== Node.js ${NODE_VERSION} のソースコードを取得 ==="
+# 作業ディレクトリの作成（ビルドは /tmp で実施）
+mkdir -p /tmp/node_build
+cd /tmp/node_build
+
+# ソースコードを取得
 wget https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz
 tar xzf node-v${NODE_VERSION}.tar.gz
 cd node-v${NODE_VERSION}
 
 # Node.js を静的リンクでビルド
 echo "=== Node.js を静的リンクでビルド ==="
-./configure --prefix=${INSTALL_DIR} --fully-static
+./configure --prefix=$HOME/mic/bin/node-${NODE_VERSION} --fully-static
 make -j$(nproc)
 make install
 
-# Xeon Phi に転送
+# Node.js を Xeon Phi に転送
 echo "=== Node.js を Xeon Phi に転送 ==="
-scp -r ${INSTALL_DIR} mic0:/home/mic/
+scp -r $HOME/mic/bin mic0:/home/mic/bin/
 
-# Xeon Phi 側で環境変数の設定 & インストール確認
+# 作業ディレクトリの削除（オプション）
+rm -rf /tmp/node_build
+
+echo "=== Node.js のビルド & クリーンアップ完了 ==="
+
+---
+
+### 2️⃣ Xeon Phi 側で環境変数の設定 & 確認 ###
 echo "=== Xeon Phi 側で環境変数を設定 & インストール確認 ==="
 ssh mic0 << 'EOF'
     NODE_VERSION="20.11.0"
-    INSTALL_DIR="/home/mic/node-${NODE_VERSION}"
 
     # 環境変数を設定
-    echo "export PATH=${INSTALL_DIR}/bin:\$PATH" >> ~/.bashrc
+    echo "export PATH=/home/mic/bin/node-${NODE_VERSION}/bin:\$PATH" >> ~/.bashrc
     source ~/.bashrc
 
     # インストール確認

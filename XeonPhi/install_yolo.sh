@@ -46,9 +46,9 @@ echo "=== OpenCV のビルド & 転送完了 ==="
 echo "=== YOLO モデルをセットアップ ==="
 
 ssh mic0 "mkdir -p /home/mic/yolo"
-scp yolov3.weights mic0:/home/mic/yolo/yolov3.weights
-scp yolov3.cfg mic0:/home/mic/yolo/yolov3.cfg
-scp coco.names mic0:/home/mic/yolo/coco.names
+scp for_upload/yolov3.weights mic0:/home/mic/yolo/yolov3.weights
+scp for_upload/yolov3.cfg mic0:/home/mic/yolo/yolov3.cfg
+scp for_upload/coco.names mic0:/home/mic/yolo/coco.names
 
 echo "=== YOLO モデルのセットアップ完了 ==="
 
@@ -69,62 +69,13 @@ echo "=== 動画のダウンロード & アップロード完了 ==="
 
 ---
 
-### 4️⃣ Xeon Phi で YOLO による物体検出を実行 ###
+### 4️⃣ Python スクリプトを Xeon Phi に転送 & 実行 ###
 echo "=== Xeon Phi で YOLO による物体検出を実行 ==="
 
-# YOLO の処理スクリプトを作成 & 転送
-cat << EOF > yolo_detect.py
-import cv2
-import numpy as np
+# `for_upload/` にある Python スクリプトを転送
+scp for_upload/yolo_detect.py mic0:/home/mic/
 
-# YOLO モデルの読み込み
-net = cv2.dnn.readNet("/home/mic/yolo/yolov3.weights", "/home/mic/yolo/yolov3.cfg")
-layer_names = net.getLayerNames()
-output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
-classes = open("/home/mic/yolo/coco.names").read().strip().split("\n")
-
-# 動画の読み込み
-cap = cv2.VideoCapture("/home/mic/downloaded_video.mp4")
-fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-out = cv2.VideoWriter("/home/mic/output.mp4", fourcc, 30, (int(cap.get(3)), int(cap.get(4))))
-
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    height, width = frame.shape[:2]
-
-    # 画像を YOLO に入力
-    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
-    net.setInput(blob)
-    detections = net.forward(output_layers)
-
-    for detection in detections:
-        for obj in detection:
-            scores = obj[5:]
-            class_id = np.argmax(scores)
-            confidence = scores[class_id]
-            if confidence > 0.5:
-                box = obj[:4] * np.array([width, height, width, height])
-                (centerX, centerY, w, h) = box.astype("int")
-                x, y = int(centerX - w / 2), int(centerY - h / 2)
-
-                # 検出されたオブジェクトを枠で囲む
-                color = (0, 255, 0)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-                label = f"{classes[class_id]}: {confidence:.2f}"
-                cv2.putText(frame, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
-    out.write(frame)
-
-cap.release()
-out.release()
-print("=== YOLO 物体検出完了！ ===")
-EOF
-
-# スクリプトを Xeon Phi に転送して実行
-scp yolo_detect.py mic0:/home/mic/
+# Xeon Phi で Python スクリプトを実行
 ssh mic0 "/home/mic/opencv/bin/python3 /home/mic/yolo_detect.py"
 
 ---

@@ -35,26 +35,16 @@ ssh mic0 "/home/mic/python/bin/python3 -m pip install --upgrade pip"
 echo "=== NumPy & OpenCV を Xeon Phi にインストール ==="
 ssh mic0 "/home/mic/python/bin/python3 -m pip install numpy opencv-python-headless"
 
-### 7️⃣ Python の動作確認スクリプトを作成 ###
-echo "=== Python の動作確認スクリプトを作成 & 転送 ==="
-cat << EOF > test_python.py
-import platform
-import sys
-import numpy as np
+### 7️⃣ Python スクリプトを Xeon Phi に転送 & 実行 ###
+echo "=== Python の動作確認スクリプトを転送 & 実行 ==="
 
-print("Python は正常に動作しています！")
-print(f"OS: {platform.system()} {platform.release()}")
-print(f"Python バージョン: {sys.version}")
-print(f"NumPy バージョン: {np.__version__}")
-EOF
+# `for_upload/` にある Python スクリプトを転送
+scp for_upload/test_python.py mic0:/home/mic/
 
-scp test_python.py mic0:/home/mic/
-
-### 8️⃣ Python スクリプトを実行 ###
-echo "=== Python スクリプトを実行 ==="
+# Xeon Phi で Python スクリプトを実行
 ssh mic0 "/home/mic/python/bin/python3 /home/mic/test_python.py"
 
-### 9️⃣ 結果を取得 ###
+### 8️⃣ 結果を取得 ###
 echo "=== 実行結果を取得 ==="
 scp mic0:/home/mic/test_python.py_result.txt .
 

@@ -1,6 +1,6 @@
-![タイトル画像](assets/images/header.png)
-
 # Intel Xeon Phi (Knights Corner) 向け Ubuntu 環境構築ガイド
+
+![タイトル画像](assets/images/header.png)
 
 このリポジトリでは、Intel Xeon Phi（Knights Corner）向けの **Ubuntu 環境構築手順** を提供します。Python のインストール、OpenCV のビルド、YOLO（You Only Look Once）を使用した物体検出、ImageMagick の活用方法について解説しています。
 

@@ -76,46 +76,13 @@ echo "=== 動画のダウンロード & アップロード完了 ==="
 
 ---
 
-### 3️⃣ Xeon Phi で OpenCV による動画処理（エフェクト or 顔認識） ###
+### 3️⃣ Python スクリプトを Xeon Phi に転送 & 実行 ###
 echo "=== Xeon Phi で OpenCV による動画処理を実行 ==="
 
-# OpenCV の処理スクリプトを作成 & 転送
-cat << EOF > process_video.py
-import cv2
+# `for_upload/` フォルダにある Python スクリプトを Xeon Phi に転送
+scp for_upload/process_video.py mic0:/home/mic/
 
-# 動画の読み込み
-cap = cv2.VideoCapture("/home/mic/downloaded_video.mp4")
-if not cap.isOpened():
-    print("動画を開けません！")
-    exit()
-
-# 出力ファイルの設定
-fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-out = cv2.VideoWriter("/home/mic/output.mp4", fourcc, 30, (int(cap.get(3)), int(cap.get(4))))
-
-# Haarcascades を使用した顔認識
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)  # 顔を矩形で囲む
-
-    out.write(frame)
-
-cap.release()
-out.release()
-print("=== 動画処理完了 ===")
-EOF
-
-# スクリプトを Xeon Phi に転送して実行
-scp process_video.py mic0:/home/mic/
+# Xeon Phi で Python スクリプトを実行
 ssh mic0 "/home/mic/opencv/bin/python3 /home/mic/process_video.py"
 
 ---

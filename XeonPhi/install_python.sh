@@ -1,47 +1,42 @@
 #!/bin/bash
 
-echo "=== Xeon Phi に Python 3.9+ をインストール & スクリプトをアップロード ==="
+echo "=== Python 3.9+ を静的リンクでビルド & Xeon Phi に転送 ==="
 
-### 1️⃣ Python 3.9+ をインストール（なければビルド） ###
-echo "=== Python のインストールを確認 ==="
-
-ssh mic0 'if ! command -v python3 &> /dev/null || python3 -c "import sys; exit(sys.version_info < (3,9))"; then
-    echo "Python 3.9+ をインストールします..."
-
-    # 必要なライブラリをインストール
-    sudo apt update && sudo apt install -y build-essential libssl-dev libffi-dev \
+### 1️⃣ 必要なライブラリをホストPCにインストール ###
+echo "=== ホストPCでビルド用のライブラリをインストール ==="
+sudo apt update
+sudo apt install -y build-essential libssl-dev libffi-dev \
                     libbz2-dev libsqlite3-dev libreadline-dev libncurses5-dev \
                     libncursesw5-dev zlib1g-dev liblzma-dev wget
 
-    # Python の最新版を取得
-    cd /home/mic/
-    wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz
+### 2️⃣ Python のソースコードを取得 ###
+echo "=== Python 3.9.17 のソースコードをダウンロード ==="
+cd /tmp
+wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz
+tar xvf Python-3.9.17.tgz
+cd Python-3.9.17
 
-    # 解凍 & コンパイル
-    tar xvf Python-3.9.17.tgz
-    cd Python-3.9.17
-    ./configure --enable-optimizations
-    make -j$(nproc)
-    sudo make altinstall
+### 3️⃣ Python を静的リンクでビルド ###
+echo "=== Python を静的リンクでビルド中（時間がかかります） ==="
+./configure --prefix=/home/mic/python --enable-optimizations LDFLAGS="-static"
+make -j$(nproc)
+make install
 
-    # Python 3.9 をデフォルトに設定
-    sudo ln -sf /usr/local/bin/python3.9 /usr/bin/python3
-    sudo ln -sf /usr/local/bin/pip3.9 /usr/bin/pip3
+### 4️⃣ Xeon Phi に Python を転送 ###
+echo "=== Python を Xeon Phi に転送 ==="
+scp -r /home/mic/python mic0:/home/mic/
 
-    echo "Python 3.9 インストール完了"
-else
-    echo "Python 3.9+ は既にインストール済み"
-fi'
+### 5️⃣ pip のインストール ###
+echo "=== pip をインストール ==="
+ssh mic0 "/home/mic/python/bin/python3 -m ensurepip"
+ssh mic0 "/home/mic/python/bin/python3 -m pip install --upgrade pip"
 
-### 2️⃣ 必要なライブラリをインストール ###
-echo "=== Python のライブラリをインストール ==="
+### 6️⃣ NumPy & OpenCV のインストール ###
+echo "=== NumPy & OpenCV を Xeon Phi にインストール ==="
+ssh mic0 "/home/mic/python/bin/python3 -m pip install numpy opencv-python-headless"
 
-ssh mic0 'pip3 install --upgrade pip'
-ssh mic0 'pip3 install numpy opencv-python opencv-python-headless'
-
-### 3️⃣ スクリプトをアップロード ###
-echo "=== Python テストスクリプトを作成 & アップロード ==="
-
+### 7️⃣ Python の動作確認スクリプトを作成 ###
+echo "=== Python の動作確認スクリプトを作成 & 転送 ==="
 cat << EOF > test_python.py
 import platform
 import sys
@@ -55,11 +50,11 @@ EOF
 
 scp test_python.py mic0:/home/mic/
 
-### 4️⃣ スクリプトを実行 ###
+### 8️⃣ Python スクリプトを実行 ###
 echo "=== Python スクリプトを実行 ==="
-ssh mic0 "python3 /home/mic/test_python.py"
+ssh mic0 "/home/mic/python/bin/python3 /home/mic/test_python.py"
 
-### 5️⃣ 結果を取得 ###
+### 9️⃣ 結果を取得 ###
 echo "=== 実行結果を取得 ==="
 scp mic0:/home/mic/test_python.py_result.txt .
 

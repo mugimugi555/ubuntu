@@ -2,30 +2,38 @@
 
 echo "=== Xeon Phi で ImageMagick を使用する準備 ==="
 
-### 1️⃣ ImageMagick のビルド（静的リンク） & 転送 ###
-echo "=== ImageMagick を静的リンクでビルド & 転送 ==="
+### 1️⃣ Xeon Phi に ImageMagick があるか確認 ###
+echo "=== Xeon Phi の ImageMagick 確認 ==="
 
-# 必要なライブラリをホストPCにインストール
-sudo apt update
-sudo apt install -y build-essential libjpeg-dev libpng-dev libtiff-dev libwebp-dev
+# Xeon Phi で ImageMagick が存在するか確認
+ssh mic0 'if [ ! -f "/home/mic/imagemagick/bin/magick" ]; then exit 1; else exit 0; fi'
+if [ $? -eq 1 ]; then
+    echo "=== ImageMagick が見つかりません。ビルドを開始します... ==="
 
-# ImageMagick のソースコードを取得
-cd /tmp
-git clone https://github.com/ImageMagick/ImageMagick.git
-cd ImageMagick
+    # 必要なライブラリをホストPCにインストール
+    sudo apt update
+    sudo apt install -y build-essential libjpeg-dev libpng-dev libtiff-dev libwebp-dev
 
-# ImageMagick を静的リンクでビルド
-./configure --prefix=/home/mic/imagemagick --enable-openmp --disable-shared LDFLAGS="-static"
-make -j$(nproc)
-make install
+    # ImageMagick のソースコードを取得
+    cd /tmp
+    git clone https://github.com/ImageMagick/ImageMagick.git
+    cd ImageMagick
 
-# ImageMagick を Xeon Phi に転送
-scp -r /home/mic/imagemagick mic0:/home/mic/
+    # ImageMagick を静的リンクでビルド
+    ./configure --prefix=/home/mic/imagemagick --enable-openmp --disable-shared LDFLAGS="-static"
+    make -j$(nproc)
+    make install
 
-# 動作確認
-ssh mic0 "/home/mic/imagemagick/bin/magick -version"
+    # ImageMagick を Xeon Phi に転送
+    scp -r /home/mic/imagemagick mic0:/home/mic/
 
-echo "=== ImageMagick のビルド & 転送完了 ==="
+    # 動作確認
+    ssh mic0 "/home/mic/imagemagick/bin/magick -version"
+
+    echo "=== ImageMagick のビルド & 転送完了 ==="
+else
+    echo "=== ImageMagick は既にインストール済み ==="
+fi
 
 ---
 

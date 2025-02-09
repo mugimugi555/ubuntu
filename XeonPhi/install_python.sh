@@ -1,50 +1,92 @@
 #!/bin/bash
 
-echo "=== Python 3.9+ を静的リンクでビルド & Xeon Phi に転送 ==="
+echo "=== Xeon Phi に Python 3.9.17 (静的リンク) をインストール ==="
 
-### 1️⃣ 必要なライブラリをホストPCにインストール ###
-echo "=== ホストPCでビルド用のライブラリをインストール ==="
+# バージョン指定
+PYTHON_VERSION="3.9.17"
+INSTALL_DIR="$HOME/mic/bin/python-${PYTHON_VERSION}"
+
+# 必要なライブラリをホストPCにインストール
+echo "=== 必要なツールをインストール（ホスト側） ==="
 sudo apt update
 sudo apt install -y build-essential libssl-dev libffi-dev \
                     libbz2-dev libsqlite3-dev libreadline-dev libncurses5-dev \
                     libncursesw5-dev zlib1g-dev liblzma-dev wget
 
-### 2️⃣ Python のソースコードを取得 ###
-echo "=== Python 3.9.17 のソースコードをダウンロード ==="
-cd /tmp
-wget https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz
-tar xvf Python-3.9.17.tgz
-cd Python-3.9.17
+### 1️⃣ ホスト側で Python のビルド & 転送 ###
+echo "=== ホスト側で Python ${PYTHON_VERSION} のビルド開始 ==="
 
-### 3️⃣ Python を静的リンクでビルド ###
-echo "=== Python を静的リンクでビルド中（時間がかかります） ==="
-./configure --prefix=/home/mic/python --enable-optimizations LDFLAGS="-static"
+# 作業ディレクトリの作成（ビルドは /tmp で実施）
+mkdir -p /tmp/python_build
+cd /tmp/python_build
+
+# Python のソースコードを取得
+wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz
+tar xvf Python-${PYTHON_VERSION}.tgz
+cd Python-${PYTHON_VERSION}
+
+# Python を静的リンクでビルド
+./configure --prefix=${INSTALL_DIR} --enable-optimizations LDFLAGS="-static"
 make -j$(nproc)
 make install
 
-### 4️⃣ Xeon Phi に Python を転送 ###
+# Python を Xeon Phi に転送
 echo "=== Python を Xeon Phi に転送 ==="
-scp -r /home/mic/python mic0:/home/mic/
+scp -r $HOME/mic/bin mic0:/home/mic/bin/
 
-### 5️⃣ pip のインストール ###
-echo "=== pip をインストール ==="
-ssh mic0 "/home/mic/python/bin/python3 -m ensurepip"
-ssh mic0 "/home/mic/python/bin/python3 -m pip install --upgrade pip"
+# 作業ディレクトリの削除（オプション）
+rm -rf /tmp/python_build
 
-### 6️⃣ NumPy & OpenCV のインストール ###
-echo "=== NumPy & OpenCV を Xeon Phi にインストール ==="
-ssh mic0 "/home/mic/python/bin/python3 -m pip install numpy opencv-python-headless"
+echo "=== Python のビルド & クリーンアップ完了 ==="
 
-### 7️⃣ Python スクリプトを Xeon Phi に転送 & 実行 ###
+---
+
+### 2️⃣ Xeon Phi 側で環境変数の設定 & 確認 ###
+echo "=== Xeon Phi 側で環境変数を設定 & インストール確認 ==="
+ssh mic0 << 'EOF'
+    PYTHON_VERSION="3.9.17"
+
+    # 環境変数を設定
+    echo "export PATH=/home/mic/bin/python-${PYTHON_VERSION}/bin:\$PATH" >> ~/.bashrc
+    source ~/.bashrc
+
+    # インストール確認
+    echo "=== Xeon Phi 側で Python のバージョン確認 ==="
+    python3 --version
+EOF
+
+echo "=== Xeon Phi に Python (静的リンク) のインストールが完了しました！ ==="
+
+---
+
+### 3️⃣ pip のインストール & パッケージ導入 ###
+echo "=== pip のインストール & 必要なライブラリの導入 ==="
+
+ssh mic0 << 'EOF'
+    PYTHON_VERSION="3.9.17"
+
+    # pip をインストール
+    /home/mic/bin/python-${PYTHON_VERSION}/bin/python3 -m ensurepip
+    /home/mic/bin/python-${PYTHON_VERSION}/bin/python3 -m pip install --upgrade pip
+
+    # NumPy & OpenCV をインストール
+    /home/mic/bin/python-${PYTHON_VERSION}/bin/python3 -m pip install numpy opencv-python-headless
+EOF
+
+echo "=== pip & ライブラリのインストール完了 ==="
+
+---
+
+### 4️⃣ Python スクリプトを Xeon Phi に転送 & 実行 ###
 echo "=== Python の動作確認スクリプトを転送 & 実行 ==="
 
 # `for_upload/` にある Python スクリプトを転送
 scp for_upload/test_python.py mic0:/home/mic/
 
 # Xeon Phi で Python スクリプトを実行
-ssh mic0 "/home/mic/python/bin/python3 /home/mic/test_python.py"
+ssh mic0 "/home/mic/bin/python-${PYTHON_VERSION}/bin/python3 /home/mic/test_python.py"
 
-### 8️⃣ 結果を取得 ###
+### 5️⃣ 結果を取得 ###
 echo "=== 実行結果を取得 ==="
 scp mic0:/home/mic/test_python.py_result.txt .
 

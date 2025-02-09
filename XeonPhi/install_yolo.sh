@@ -1,54 +1,78 @@
 #!/bin/bash
 
-echo "=== Xeon Phi に OpenCV と YOLO をインストール ==="
+echo "=== Xeon Phi で OpenCV & YOLO を使用する準備 ==="
 
-# 必要なライブラリをインストール
-ssh mic0 'sudo apt update && sudo apt install -y cmake g++ wget unzip python3-dev python3-numpy \
-                    libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev'
+### 1️⃣ OpenCV のビルド（静的リンク） & 転送 ###
+echo "=== OpenCV を静的リンクでビルド & 転送 ==="
 
-# OpenCV のインストール（なければビルド）
-ssh mic0 'if ! command -v python3 &> /dev/null || ! python3 -c "import cv2" 2>/dev/null; then
-    echo "OpenCV をビルドします..."
-    git clone https://github.com/opencv/opencv.git && git clone https://github.com/opencv/opencv_contrib.git
-    mkdir -p opencv/build && cd opencv/build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE \
-          -D CMAKE_INSTALL_PREFIX=/usr/local \
-          -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
-          -D ENABLE_CXX11=ON -D WITH_OPENMP=ON -D WITH_TBB=OFF -D WITH_GTK=OFF -D WITH_QT=OFF \
-          -D BUILD_EXAMPLES=OFF -D BUILD_opencv_apps=OFF -D BUILD_TESTS=OFF -D BUILD_DOCS=OFF \
-          -D BUILD_PERF_TESTS=OFF -D ENABLE_PRECOMPILED_HEADERS=OFF -D ENABLE_NEON=OFF \
-          -D WITH_V4L=OFF -D WITH_OPENGL=OFF -D WITH_FFMPEG=ON -D WITH_AVFOUNDATION=OFF ..
-    make -j$(nproc) && sudo make install
-fi'
+# 必要なライブラリをホストPCにインストール
+sudo apt update
+sudo apt install -y build-essential cmake g++ wget unzip \
+                    libjpeg-dev libpng-dev libtiff-dev \
+                    libavcodec-dev libavformat-dev libswscale-dev
 
-echo "=== YOLO モデルのダウンロード ==="
-ssh mic0 'mkdir -p /home/mic/yolo && cd /home/mic/yolo'
-ssh mic0 'wget -O /home/mic/yolo/yolov3.weights https://pjreddie.com/media/files/yolov3.weights'
-ssh mic0 'wget -O /home/mic/yolo/yolov3.cfg https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg?raw=true'
-ssh mic0 'wget -O /home/mic/yolo/coco.names https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true'
+# OpenCV のソースコードを取得
+cd /tmp
+git clone https://github.com/opencv/opencv.git
+git clone https://github.com/opencv/opencv_contrib.git
+cd opencv
 
-echo "=== OpenCV & YOLO のインストール完了 ==="
+# OpenCV を静的リンクでビルド
+mkdir -p build && cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=/home/mic/opencv \
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+      -D ENABLE_CXX11=ON -D WITH_OPENMP=ON -D WITH_TBB=OFF \
+      -D WITH_GTK=OFF -D WITH_QT=OFF -D BUILD_EXAMPLES=OFF \
+      -D BUILD_opencv_apps=OFF -D BUILD_TESTS=OFF -D BUILD_DOCS=OFF \
+      -D BUILD_PERF_TESTS=OFF -D ENABLE_PRECOMPILED_HEADERS=OFF \
+      -D ENABLE_NEON=OFF -D WITH_V4L=OFF -D WITH_OPENGL=OFF \
+      -D WITH_FFMPEG=ON -D WITH_AVFOUNDATION=OFF \
+      -D BUILD_SHARED_LIBS=OFF -D CMAKE_EXE_LINKER_FLAGS="-static" ..
+make -j$(nproc)
+make install
 
-### 2️⃣ 動画のダウンロード（yt-dlp を使用） ###
-echo "=== ut-dlp（yt-dlp）を使用して動画をダウンロード ==="
+# OpenCV を Xeon Phi に転送
+scp -r /home/mic/opencv mic0:/home/mic/
 
+# 動作確認
+ssh mic0 "/home/mic/opencv/bin/opencv_version"
+
+echo "=== OpenCV のビルド & 転送完了 ==="
+
+---
+
+### 2️⃣ YOLO モデルのダウンロード & 転送 ###
+echo "=== YOLO モデルをセットアップ ==="
+
+ssh mic0 "mkdir -p /home/mic/yolo"
+scp yolov3.weights mic0:/home/mic/yolo/yolov3.weights
+scp yolov3.cfg mic0:/home/mic/yolo/yolov3.cfg
+scp coco.names mic0:/home/mic/yolo/coco.names
+
+echo "=== YOLO モデルのセットアップ完了 ==="
+
+---
+
+### 3️⃣ YouTube から動画をダウンロード & 転送 ###
+echo "=== yt-dlp を使用して動画をダウンロード ==="
+
+# ダウンロードする動画 URL
 VIDEO_URL="https://www.youtube.com/watch?v=EPJe3FqMSy0"
 
-if ! command -v yt-dlp &> /dev/null; then
-    echo "yt-dlp をインストール..."
-    pip3 install -U yt-dlp
-fi
-
-yt-dlp -f "best" "$VIDEO_URL" -o "downloaded_video.mp4"
+# yt-dlp をホストPCで実行
+./yt-dlp -f "best" "$VIDEO_URL" -o "downloaded_video.mp4"
 
 # Xeon Phi に動画をアップロード
 scp downloaded_video.mp4 mic0:/home/mic/
 echo "=== 動画のダウンロード & アップロード完了 ==="
 
-### 3️⃣ Xeon Phi で YOLO を実行 ###
+---
+
+### 4️⃣ Xeon Phi で YOLO による物体検出を実行 ###
 echo "=== Xeon Phi で YOLO による物体検出を実行 ==="
 
-# OpenCV の処理スクリプトを作成 & 転送
+# YOLO の処理スクリプトを作成 & 転送
 cat << EOF > yolo_detect.py
 import cv2
 import numpy as np
@@ -101,9 +125,11 @@ EOF
 
 # スクリプトを Xeon Phi に転送して実行
 scp yolo_detect.py mic0:/home/mic/
-ssh mic0 "python3 /home/mic/yolo_detect.py"
+ssh mic0 "/home/mic/opencv/bin/python3 /home/mic/yolo_detect.py"
 
-### 4️⃣ 処理済み動画をホストに取得 ###
+---
+
+### 5️⃣ 処理済み動画をホストに取得 ###
 echo "=== 処理済み動画を取得 ==="
 scp mic0:/home/mic/output.mp4 .
 

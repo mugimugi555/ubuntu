@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== PHP をビルドして Xeon Phi に転送 ==="
+echo "=== PHP を静的リンクでビルド & Xeon Phi に転送 ==="
 
 # 必要なパッケージをホストPCにインストール
 sudo apt update
@@ -14,8 +14,8 @@ wget https://www.php.net/distributions/php-8.2.6.tar.gz
 tar xvf php-8.2.6.tar.gz
 cd php-8.2.6
 
-# PHP をビルド
-./configure --prefix=/home/mic/php --disable-all --enable-cli
+# PHP を静的リンクでビルド
+./configure --prefix=/home/mic/php --disable-all --enable-cli LDFLAGS="-static"
 make -j$(nproc)
 make install
 

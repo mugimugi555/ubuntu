@@ -4,8 +4,8 @@
 
 ## 概要
 このスクリプトは、指定した GitHub ユーザーのリポジトリ一覧を取得し、
-すべてのリポジトリを HTTPS 経由でクローンする `clone_repos.sh` と、
-リポジトリの ZIP をダウンロードして解凍する `download_repos.sh` の2つのスクリプトを提供します。
+「すべてのリポジトリを HTTPS 経由でクローンする `clone_repos.sh`」と、
+「リポジトリの ZIP をダウンロードして解凍する `download_repos.sh`」の2つのスクリプトを提供します。
 
 ## 必要な環境
 - Linux または macOS

@@ -16,8 +16,8 @@
 
 1. スクリプトをダウンロードまたは作成
    ```sh
-   wget https://raw.githubusercontent.com/mugimugi555/ubuntu/refs/heads/main/github_tool/clone_repos.sh -O clone_repos.sh
-   wget [https://example.com/download_repos.sh](https://raw.githubusercontent.com/mugimugi555/ubuntu/refs/heads/main/github_tool/download_repos.sh) -O download_repos.sh
+   wget https://raw.githubusercontent.com/mugimugi555/ubuntu/refs/heads/main/github_tool/clone_repos.sh
+   wget https://raw.githubusercontent.com/mugimugi555/ubuntu/refs/heads/main/github_tool/download_repos.sh
    ```
    または、手動で `clone_repos.sh` と `download_repos.sh` を作成し、スクリプトを記述。
 

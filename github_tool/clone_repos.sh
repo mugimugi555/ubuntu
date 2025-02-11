@@ -11,13 +11,22 @@ echo "Fetching repository list for $USER..."
 curl -s "https://github.com/$USER?tab=repositories" > "$TMP_FILE"
 
 # リポジトリ名を抽出
-REPOS=$(grep -oP '(?<=<a href="/'$USER'/)[^"]+(?=" itemprop="name codeRepository")' "$TMP_FILE")
+REPOS=($(grep -oP '(?<=<a href="/'$USER'/)[^"]+(?=" itemprop="name codeRepository")' "$TMP_FILE"))
 
 # 一時ファイルを削除
 rm -f "$TMP_FILE"
 
+# 総リポジトリ数を取得
+TOTAL_REPOS=${#REPOS[@]}
+
+# 総リポジトリ数を表示
+echo "Found $TOTAL_REPOS repositories."
+
 # 取得したリポジトリを1つずつクローン（HTTPS 版）
-for repo in $REPOS; do
-    echo "Cloning https://github.com/$USER/$repo.git..."
+for i in "${!REPOS[@]}"; do
+    repo="${REPOS[$i]}"
+    echo "[$((i+1))/$TOTAL_REPOS] Cloning https://github.com/$USER/$repo.git..."
     git clone "https://github.com/$USER/$repo.git"
 done
+
+echo "All repositories cloned."

@@ -11,6 +11,7 @@ echo "Fetching repository list for $USER..."
 curl -s "https://github.com/$USER?tab=repositories" > "$TMP_FILE"
 
 # リポジトリ名を抽出
+# shellcheck disable=SC2207
 REPOS=($(grep -oP '(?<=<a href="/'$USER'/)[^"]+(?=" itemprop="name codeRepository")' "$TMP_FILE"))
 
 # 一時ファイルを削除

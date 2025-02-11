@@ -30,14 +30,14 @@
 
 #### 他の GitHub ユーザーのリポジトリをクローン
 ```sh
-./clone_repos.sh GitHubユーザー名
+bash clone_repos.sh GitHubユーザー名
 ```
 
 ### `download_repos.sh`（リポジトリの ZIP をダウンロード & 解凍）
 
 #### 他の GitHub ユーザーのリポジトリをダウンロード
 ```sh
-./download_repos.sh GitHubユーザー名
+bash download_repos.sh GitHubユーザー名
 ```
 
 ## 動作手順

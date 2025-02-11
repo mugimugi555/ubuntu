@@ -1,4 +1,4 @@
-# githubレポジトリ一括取得ツールの使い方
+# GitHubレポジトリ一括取得ツールの使い方
 
 ![タイトル画像](assets/images/header.png)
 

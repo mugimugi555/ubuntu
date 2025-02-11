@@ -1,7 +1,9 @@
-# clone_repos.sh および download_repos.sh の使い方
+# レポジトリ一括取得ツールの使い方
 
 ## 概要
-このスクリプトは、指定した GitHub ユーザーのリポジトリ一覧を取得し、すべてのリポジトリを HTTPS 経由でクローンする `clone_repos.sh` と、リポジトリの ZIP をダウンロードして解凍する `download_repos.sh` の2つのスクリプトを提供します。
+このスクリプトは、指定した GitHub ユーザーのリポジトリ一覧を取得し、
+すべてのリポジトリを HTTPS 経由でクローンする `clone_repos.sh` と、
+リポジトリの ZIP をダウンロードして解凍する `download_repos.sh` の2つのスクリプトを提供します。
 デフォルトでは、`mugimugi555` のリポジトリを対象とします。
 
 ## 必要な環境
@@ -11,6 +13,7 @@
 - `unzip` コマンド（ZIP 解凍用）
 
 ## インストール
+
 1. スクリプトをダウンロードまたは作成
    ```sh
    wget https://example.com/clone_repos.sh -O clone_repos.sh
@@ -25,33 +28,17 @@
 
 ## 使い方
 ### `clone_repos.sh`（Gitリポジトリをクローン）
-#### デフォルト（mugimugi555 のリポジトリをクローン）
-```sh
-./clone_repos.sh
-```
 
 #### 他の GitHub ユーザーのリポジトリをクローン
 ```sh
 ./clone_repos.sh GitHubユーザー名
 ```
-例:
-```sh
-./clone_repos.sh exampleuser
-```
 
 ### `download_repos.sh`（リポジトリの ZIP をダウンロード & 解凍）
-#### デフォルト（mugimugi555 のリポジトリをダウンロード）
-```sh
-./download_repos.sh
-```
 
 #### 他の GitHub ユーザーのリポジトリをダウンロード
 ```sh
 ./download_repos.sh GitHubユーザー名
-```
-例:
-```sh
-./download_repos.sh exampleuser
 ```
 
 ## 動作手順
@@ -68,9 +55,7 @@
 
 ## 注意点
 - クローン先またはダウンロード先のディレクトリには十分な書き込み権限があることを確認してください。
-- GitHub の API 制限にかかる可能性があるため、多数のリポジトリを持つユーザーの場合は注意してください。
 - 既存のディレクトリやファイルとリポジトリ名が重複する場合、エラーが発生する可能性があります。
-- `download_repos.sh` で ZIP をダウンロードする場合、すべてのリポジトリがパブリックである必要があります。
 
 ## ライセンス
 このスクリプトは MIT ライセンスの下で提供されます。

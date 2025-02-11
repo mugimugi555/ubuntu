@@ -22,11 +22,6 @@
    ```
    または、手動で `clone_repos.sh` と `download_repos.sh` を作成し、スクリプトを記述。
 
-2. 実行権限を付与
-   ```sh
-   chmod +x clone_repos.sh download_repos.sh
-   ```
-
 ## 使い方
 ### `clone_repos.sh`（Gitリポジトリをクローン）
 

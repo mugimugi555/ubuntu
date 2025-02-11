@@ -27,18 +27,15 @@ for i in "${!REPOS[@]}"; do
     # ZIPのURLを構築
     ZIP_URL="https://github.com/$USER/$repo/archive/refs/heads/main.zip"
 
-    # ZIP をダウンロード（プログレスバー付き）
-    wget --progress=bar:force -O "$repo.zip" "$ZIP_URL"
+    # ZIP をダウンロード（進捗なし）
+    wget -q -O "$repo.zip" "$ZIP_URL"
 
     # ZIP を解凍
-    echo "Unzipping $repo.zip..."
+    echo "Extracting $repo..."
     if unzip -q "$repo.zip"; then
-        echo "Successfully extracted $repo"
-
         # `-main` がついたフォルダをリネーム
         if [ -d "$repo-main" ]; then
             mv "$repo-main" "$repo"
-            echo "Renamed folder: $repo-main → $repo"
         fi
     else
         echo "Error extracting $repo.zip"
@@ -48,4 +45,4 @@ for i in "${!REPOS[@]}"; do
     rm "$repo.zip"
 done
 
-echo "All repositories downloaded, extracted, and renamed."
+echo "All repositories downloaded and extracted."

@@ -64,6 +64,8 @@ sudo snap connect losslesscut:removable-media ;
 sudo snap install --classic code ;
 sudo snap install --classic gimp ;
 # sudo snap install phpstorm --classic
+# sudo snap install pycharm-community --classic
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # setting jp

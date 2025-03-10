@@ -63,6 +63,7 @@ sudo snap connect losslesscut:removable-media ;
 #-----------------------------------------------------------------------------------------------------------------------
 sudo snap install --classic code ;
 sudo snap install --classic gimp ;
+# sudo snap install phpstorm --classic
 
 #-----------------------------------------------------------------------------------------------------------------------
 # setting jp

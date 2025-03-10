@@ -57,6 +57,7 @@ sudo snap connect kdiskmark:removable-media ;
 sudo snap install losslesscut ;
 sudo snap connect losslesscut:removable-media ;
 
+
 #-----------------------------------------------------------------------------------------------------------------------
 # vscode & gimp
 #-----------------------------------------------------------------------------------------------------------------------
@@ -97,6 +98,8 @@ sudo chmod a+rx /usr/local/bin/youtube-dl ;
 #-----------------------------------------------------------------------------------------------------------------------
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_current_amd64.deb ;
 sudo sudo apt install -y ./google-chrome-stable_current_amd64.deb ;
+
+sudo snap install brave ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # remote desktop

@@ -1,29 +1,51 @@
 #!/usr/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_nodejs.sh && bash install_nodejs.sh ;
+# =============================================================
+# Node.js & npm & Yarn 最新版インストールスクリプト
+# =============================================================
 
-sudo echo;
+echo "✅ Node.js の最新版をインストールします..."
 
-#
-sudo apt install -y nodejs npm ;
-node -v ;
-npm  -v ;
+# 必要なパッケージの更新
+sudo apt update -y
+sudo apt install -y curl
 
-#
-sudo npm install n -g ;
-sudo n stable ;
-sudo npm install -g yarn ;
-sudo apt purge -y nodejs ;
-sudo apt autoremove -y ;
-exec $SHELL -l ;
+# 既存の nodejs を削除
+echo "🗑️ 既存の Node.js を削除..."
+sudo apt purge -y nodejs npm
+sudo apt autoremove -y
 
-#
-#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - ;
-#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list ;
-#sudo apt update ;
-#sudo apt install -y yarn ;
+# =============================================================
+# Node.js を n を使って最新版に更新
+# =============================================================
+echo "🚀 Node.js の最新版をインストール..."
 
-#
-node -v ;
-npm  -v ;
-yarn -v ;
+# `npm` をインストール
+sudo apt install -y npm
+
+# `n` コマンドをグローバルインストール
+sudo npm install -g n
+
+# 最新の安定版 Node.js をインストール
+sudo n stable
+
+# 古い `nodejs` パッケージを削除
+sudo apt purge -y nodejs
+sudo apt autoremove -y
+
+# =============================================================
+# Yarn のインストール
+# =============================================================
+echo "📦 Yarn をインストール..."
+sudo npm install -g yarn
+
+# =============================================================
+# バージョン確認
+# =============================================================
+echo "✅ インストールされたバージョン:"
+node -v
+npm -v
+yarn -v
+
+# シェルを再読み込みして変更を適用
+exec $SHELL -l

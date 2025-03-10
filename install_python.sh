@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # =============================================================
-# Ubuntu に Python の最新版をインストールし、venv をセットアップ
+# Ubuntu に Python の最新版をインストールし、複数の venv 環境をセットアップ
 # =============================================================
 
 echo "✅ Python 最新版 & venv のセットアップを開始します..."
@@ -21,41 +21,63 @@ PYTHON_VERSION=$(python3 --version | awk '{print $2}')
 echo "✅ Python $PYTHON_VERSION をインストールしました！"
 
 # =============================================================
-# venv 仮想環境の作成
+# venv 仮想環境の作成 (最新版)
 # =============================================================
-echo "🔧 Python 仮想環境 (venv) を作成..."
+echo "🔧 Python の仮想環境 (venv) を作成..."
 
-# 仮想環境のディレクトリを作成
-VENV_DIR="$HOME/my_python_env"
-if [ ! -d "$VENV_DIR" ]; then
-    python3 -m venv "$VENV_DIR"
-    echo "✅ 仮想環境を作成しました: $VENV_DIR"
+# 最新版 Python 用の仮想環境
+VENV_DIR="$HOME/python_envs"
+LATEST_VENV="$VENV_DIR/venv-latest"
+
+mkdir -p "$VENV_DIR"
+
+if [ ! -d "$LATEST_VENV" ]; then
+    python3 -m venv "$LATEST_VENV"
+    echo "✅ 仮想環境を作成しました: $LATEST_VENV"
 else
-    echo "✅ 仮想環境はすでに存在します: $VENV_DIR"
+    echo "✅ 仮想環境はすでに存在します: $LATEST_VENV"
 fi
 
-# 仮想環境を有効化
-echo "🌟 仮想環境を有効化..."
-source "$VENV_DIR/bin/activate"
+# =============================================================
+# Python のメジャーバージョンごとに仮想環境を作成
+# =============================================================
+echo "🔧 複数バージョンの仮想環境をセットアップ..."
+PYTHON_VERSIONS=("3.6" "3.7" "3.8" "3.9" "3.10" "3.11" "3.12")
+
+for VERSION in "${PYTHON_VERSIONS[@]}"; do
+    PYTHON_BIN=$(command -v python$VERSION)
+    ENV_NAME="venv$VERSION"
+    ENV_PATH="$VENV_DIR/$ENV_NAME"
+
+    if [ -x "$PYTHON_BIN" ]; then
+        if [ ! -d "$ENV_PATH" ]; then
+            echo "🔧 Python $VERSION の仮想環境を作成中..."
+            $PYTHON_BIN -m venv "$ENV_PATH"
+            echo "✅ 仮想環境が作成されました: $ENV_PATH"
+        else
+            echo "✅ 既に存在します: $ENV_PATH"
+        fi
+    else
+        echo "⚠️ Python $VERSION はシステムにインストールされていません。"
+    fi
+done
 
 # =============================================================
-# 必要な Python パッケージをインストール
+# 使い方の案内
 # =============================================================
-echo "📦 pip を最新にアップデート..."
-pip install --upgrade pip
-
-# インストール済みパッケージの確認
-pip list
-
-# =============================================================
-# インストールの確認
-# =============================================================
-echo "🐍 インストールされた Python のバージョン:"
-python --version
-pip --version
-
-echo "✅ 仮想環境が有効化されました！"
-echo "📝 仮想環境を終了するには 'deactivate' を実行してください。"
+echo "🎉 仮想環境のセットアップが完了しました！"
+echo "🔹 仮想環境を有効化するには以下のコマンドを実行してください:"
+echo "----------------------------------------"
+echo "source $VENV_DIR/venv-latest/bin/activate  # 最新版"
+for VERSION in "${PYTHON_VERSIONS[@]}"; do
+    ENV_NAME="venv$VERSION"
+    ENV_PATH="$VENV_DIR/$ENV_NAME"
+    if [ -d "$ENV_PATH" ]; then
+        echo "source $ENV_PATH/bin/activate  # Python $VERSION"
+    fi
+done
+echo "----------------------------------------"
+echo "🚀 必要な環境を有効化して開発を始めてください！"
 
 # シェルを再読み込み
 exec $SHELL -l

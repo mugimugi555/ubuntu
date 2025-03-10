@@ -47,6 +47,7 @@ sudo apt upgrade -y ;
 
 # exfat-utils 
 sudo apt install -y emacs-nox htop curl git axel samba openssh-server net-tools exfat-fuse ffmpeg ibus-mozc imagemagick lame unar vlc ;
+sudo apt install -y ffmpeg yt-dlp
 sudo apt autoremove -y ;
 
 # kdiskmark
@@ -56,7 +57,6 @@ sudo snap connect kdiskmark:removable-media ;
 # losslesscut
 sudo snap install losslesscut ;
 sudo snap connect losslesscut:removable-media ;
-
 
 #-----------------------------------------------------------------------------------------------------------------------
 # vscode & gimp

@@ -54,6 +54,21 @@ cat /etc/apt-fast.conf
 echo "🔹 apt の並列ダウンロード設定:"
 cat /etc/apt/apt.conf.d/99parallel
 
+# `.bashrc` にエイリアスを追加（重複を防ぐ）
+BASHRC_FILE="$HOME/.bashrc"
+ALIAS_CMD="alias apt='function _apt() { case \"\$1\" in install|update|upgrade|dist-upgrade|full-upgrade) apt-fast \"\$@\";; *) command apt \"\$@\";; esac; }; _apt'"
+
+if ! grep -q "alias apt=" "$BASHRC_FILE"; then
+    echo "$ALIAS_CMD" >> "$BASHRC_FILE"
+    echo "✅ .bashrc にエイリアスを追加しました。"
+else
+    echo "ℹ️ 既にエイリアスが設定されています。変更は不要です。"
+fi
+
+# エイリアスを即時適用
+echo "🔄 エイリアスを適用中..."
+source "$BASHRC_FILE"
+
 echo "✅ apt-fast のソースインストール & apt の並列化が完了しました！"
 echo "🔹 高速ダウンロードの例:"
 echo "   sudo apt-fast install <package-name>"

@@ -36,12 +36,9 @@ else
     sudo ./configure --prefix=/usr/local
     sudo make -j$(nproc)
     sudo make install
-
-    # 🔹 ldconfig を実行してシステムに認識させる
     sudo ldconfig
 
-    # 🔍 libmpdec のインストールを確認
-    if ! ls -l /usr/local/lib | grep -q "libmpdec.so"; then
+    if ! ls /usr/local/lib/libmpdec.so* 2>/dev/null; then
         echo "❌ libmpdec.so のインストールが正しく完了していません！"
         exit 1
     fi
@@ -68,15 +65,19 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     sudo tar -xvf "Python-$full_version.tgz"
     cd "Python-$full_version"
 
-    # 環境変数の設定
+    # 🔹 gcov を無効化
+    export CFLAGS="-fno-profile-arcs -fno-test-coverage"
     export LDFLAGS="-Wl,-rpath=/usr/local/lib -L/usr/local/lib"
     export CPPFLAGS="-I/usr/local/include"
-    
+
     echo "🔹 Python $full_version を最適化コンパイル中..."
     sudo ./configure --enable-optimizations --enable-shared --prefix="$INSTALL_DIR/$version" \
-        --disable-test-modules --without-doc-strings
+        --disable-test-modules --without-doc-strings --without-gcov
 
-    # make install を明示的に実行
+    # 🔹 古いビルドを削除
+    sudo make clean
+
+    # make install を実行
     sudo make -j$(nproc)
     sudo make install
     sudo make altinstall
@@ -89,3 +90,33 @@ for version in "${PYTHON_VERSIONS[@]}"; do
 done
 
 echo "✅ Python の最適化インストールが完了しました！"
+
+# 仮想環境の作成
+mkdir -p "$VENV_DIR"
+echo "🔹 仮想環境の作成を開始します..."
+
+for version in "${PYTHON_VERSIONS[@]}"; do
+    VENV_PATH="$VENV_DIR/python$version-venv"
+
+    if [ -x "/usr/local/bin/python$version" ]; then
+        echo "🔹 Python $version 用の仮想環境を作成: $VENV_PATH"
+
+        # 仮想環境を作成
+        "/usr/local/bin/python$version" -m venv "$VENV_PATH"
+
+        # 仮想環境を有効化して pip を最新に更新
+        source "$VENV_PATH/bin/activate"
+        pip install --upgrade pip setuptools wheel
+        deactivate
+
+        echo "✅ 仮想環境 $VENV_PATH のセットアップ完了！"
+    else
+        echo "⚠️ Python $version が見つかりませんでした。仮想環境の作成をスキップします。"
+    fi
+done
+
+echo "✅ すべての Python 仮想環境が作成されました！"
+echo "📌 仮想環境の場所: $VENV_DIR"
+echo "🔹 仮想環境の使用方法:"
+echo "   source $VENV_DIR/python3.10-venv/bin/activate  # Python 3.10 を使用"
+echo "   deactivate  # 仮想環境を終了"

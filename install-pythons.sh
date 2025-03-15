@@ -25,10 +25,10 @@ sudo apt install -y \
 
 # `libmpdec` の存在を確認し、インストール
 if apt-cache search libmpdec | grep -q "libmpdec"; then
-    echo "✅ `libmpdec` が見つかりました。APT でインストールします。"
+    echo "✅ libmpdec が見つかりました。APT でインストールします。"
     sudo apt install -y libmpdec3
 else
-    echo "⚠️ `libmpdec` が見つかりません。ソースからビルドします。"
+    echo "⚠️ libmpdec が見つかりません。ソースからビルドします。"
     cd /usr/src
     sudo curl -O https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz
     sudo tar -xvf mpdecimal-2.5.1.tar.gz
@@ -36,7 +36,7 @@ else
     sudo ./configure --prefix=/usr/local
     sudo make -j$(nproc)
     sudo make install
-    echo "✅ `libmpdec` のインストールが完了しました。"
+    echo "✅ libmpdec のインストールが完了しました。"
 fi
 
 # インストールディレクトリを作成

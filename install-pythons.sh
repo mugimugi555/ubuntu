@@ -25,10 +25,10 @@ sudo apt install -y \
 
 # `libmpdec` の存在を確認し、インストール
 if apt-cache search libmpdec | grep -q "libmpdec"; then
-    echo "✅ libmpdec が見つかりました。APT でインストールします。"
+    echo "✅ `libmpdec` が見つかりました。APT でインストールします。"
     sudo apt install -y libmpdec3
 else
-    echo "⚠️ libmpdec が見つかりません。ソースからビルドします。"
+    echo "⚠️ `libmpdec` が見つかりません。ソースからビルドします。"
     cd /usr/src
     sudo curl -O https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz
     sudo tar -xvf mpdecimal-2.5.1.tar.gz
@@ -36,7 +36,7 @@ else
     sudo ./configure --prefix=/usr/local
     sudo make -j$(nproc)
     sudo make install
-    echo "✅ libmpdec のインストールが完了しました。"
+    echo "✅ `libmpdec` のインストールが完了しました。"
 fi
 
 # インストールディレクトリを作成
@@ -59,11 +59,17 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     sudo tar -xvf "Python-$full_version.tgz"
     cd "Python-$full_version"
 
+    # 環境変数の設定
+    export LDFLAGS="-Wl,-rpath=/usr/local/lib -L/usr/local/lib"
+    export CPPFLAGS="-I/usr/local/include"
+    
     echo "🔹 Python $full_version を最適化コンパイル中..."
     sudo ./configure --enable-optimizations --enable-shared --prefix="$INSTALL_DIR/$version" \
-        --disable-test-modules --without-doc-strings \
-        LDFLAGS="-L/usr/local/lib" CPPFLAGS="-I/usr/local/include"
-    sudo make -j$(nproc) SKIP_TESTS=yes
+        --disable-test-modules --without-doc-strings
+
+    # `make install` を明示的に実行
+    sudo make -j$(nproc)
+    sudo make install
     sudo make altinstall  # テストを省略して高速インストール
 
     # シンボリックリンクを作成

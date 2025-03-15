@@ -61,23 +61,35 @@ setup_client() {
     ray stop
     ray start --address="$SERVER_IP:6379"
 
-    # 🔹 GPU を使うテストタスク
-    echo "🔹 GPU の使用可否をテスト..."
+    # 🔹 GPU の使用可否 & ステータス一覧を取得
+    echo "🔹 リモート GPU の状態を確認中..."
     python - <<EOF
 import ray
 
 ray.init(address="auto")
 
 @ray.remote(num_gpus=1)
-def gpu_task():
+def gpu_status():
     import torch
-    return torch.cuda.get_device_name(0)
+    if not torch.cuda.is_available():
+        return "❌ GPU が利用できません。"
+
+    gpu_info = []
+    for i in range(torch.cuda.device_count()):
+        gpu_name = torch.cuda.get_device_name(i)
+        total_memory = torch.cuda.get_device_properties(i).total_memory / 1024**3  # GB単位
+        used_memory = torch.cuda.memory_allocated(i) / 1024**3  # GB単位
+        free_memory = total_memory - used_memory
+
+        gpu_info.append(f"GPU {i}: {gpu_name} | Total: {total_memory:.2f} GB | Used: {used_memory:.2f} GB | Free: {free_memory:.2f} GB")
+
+    return "\n".join(gpu_info)
 
 try:
-    gpu_name = ray.get(gpu_task.remote())
-    print(f"✅ リモート GPU: {gpu_name} を使用可能")
+    gpu_status_result = ray.get(gpu_status.remote())
+    print(f"✅ リモート GPU のステータス:\n{gpu_status_result}")
 except Exception as e:
-    print(f"❌ GPU タスクの実行に失敗: {e}")
+    print(f"❌ GPU 情報の取得に失敗: {e}")
     exit 1
 EOF
 

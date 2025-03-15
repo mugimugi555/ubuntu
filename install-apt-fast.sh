@@ -8,7 +8,7 @@ fi
 
 echo "🔹 必要なパッケージをインストール中..."
 sudo apt update
-sudo apt install -y curl git software-properties-common
+sudo apt install -y curl git software-properties-common debconf-utils
 
 # Ubuntu バージョンを取得
 UBUNTU_VERSION=$(lsb_release -rs)
@@ -33,6 +33,12 @@ if check_ppa_support "$UBUNTU_CODENAME"; then
     echo "📥 apt-fast を PPA からインストール中..."
     sudo add-apt-repository -y ppa:apt-fast/stable
     sudo apt update -y
+
+    # ウィザードを無効化する設定
+    echo "🔹 apt-fast のデフォルト設定を適用..."
+    echo "apt-fast apt-fast/maxdownloads string 5" | sudo debconf-set-selections
+    echo "apt-fast apt-fast/dlmanager string apt" | sudo debconf-set-selections
+
     sudo apt install -y apt-fast aria2
 
 else

@@ -178,7 +178,7 @@ MYALIAS=$(cat<<TEXT
 # myalias
 alias a="axel -a -n 10"
 alias u='unar'
-alias up='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y'
+alias up='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y ; sudo snap refresh '
 
 TEXT
 )

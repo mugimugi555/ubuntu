@@ -6,7 +6,7 @@ INSTALL_DIR="/usr/local/python"
 # 仮想環境のディレクトリ
 VENV_DIR="$HOME/python_venvs"
 
-# 固定の Python バージョンリスト
+# Python バージョンリスト
 PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
 
 # 必要なパッケージをインストール
@@ -21,28 +21,15 @@ sudo apt install -y \
     curl libbz2-dev liblzma-dev \
     tk-dev libexpat1-dev \
     libgdbm-compat-dev libuuid1 uuid-dev \
-    libffi-dev
+    libffi-dev software-properties-common
 
-# libmpdec の存在を確認し、インストール
-if apt-cache search libmpdec | grep -q "libmpdec"; then
-    echo "✅ libmpdec が見つかりました。APT でインストールします。"
-    sudo apt install -y libmpdec3
+# 🔹 PPA の追加を試みる
+echo "🔹 PPA の追加を試行中..."
+if sudo add-apt-repository -y ppa:deadsnakes/ppa; then
+    echo "✅ PPA が追加されました。"
+    sudo apt update
 else
-    echo "⚠️ libmpdec が見つかりません。ソースからビルドします。"
-    cd /usr/src
-    sudo curl -O https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz
-    sudo tar -xvf mpdecimal-2.5.1.tar.gz
-    cd mpdecimal-2.5.1
-    sudo ./configure --prefix=/usr/local
-    sudo make -j$(nproc)
-    sudo make install
-    sudo ldconfig
-
-    if ! ls /usr/local/lib/libmpdec.so* 2>/dev/null; then
-        echo "❌ libmpdec.so のインストールが正しく完了していません！"
-        exit 1
-    fi
-    echo "✅ libmpdec.so のインストールが完了しました。"
+    echo "⚠️ PPA の追加に失敗しました。"
 fi
 
 # インストールディレクトリを作成
@@ -50,9 +37,19 @@ sudo mkdir -p "$INSTALL_DIR"
 
 # 各 Python バージョンをインストール
 for version in "${PYTHON_VERSIONS[@]}"; do
-    echo "🔹 Python $version をソースからビルド中..."
+    echo "🔹 Python $version のインストールを確認中..."
 
-    # ソースからビルド
+    # 🔹 APT での Python インストールを試みる
+    if apt-cache show "python$version" &>/dev/null; then
+        echo "✅ Python $version が APT で利用可能です。インストールします..."
+        sudo apt install -y "python$version" "python$version-venv" "python$version-dev"
+        continue
+    else
+        echo "⚠️ Python $version は APT で見つかりません。"
+    fi
+
+    # 🔹 ソースからビルド
+    echo "🔹 Python $version をソースからビルド中..."
     full_version=$(curl -s https://www.python.org/ftp/python/ | grep -oP "$version\.\d+" | tail -1)
     if [ -z "$full_version" ]; then
         echo "❌ Python $version の最新バージョンが取得できませんでした。スキップします。"
@@ -65,7 +62,7 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     sudo tar -xvf "Python-$full_version.tgz"
     cd "Python-$full_version"
 
-    # 🔹 gcov を無効化
+    # 最適化オプションを設定
     export CFLAGS="-fno-profile-arcs -fno-test-coverage"
     export LDFLAGS="-Wl,-rpath=/usr/local/lib -L/usr/local/lib"
     export CPPFLAGS="-I/usr/local/include"
@@ -74,10 +71,7 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     sudo ./configure --enable-optimizations --enable-shared --prefix="$INSTALL_DIR/$version" \
         --disable-test-modules --without-doc-strings --without-gcov
 
-    # 🔹 古いビルドを削除
     sudo make clean
-
-    # make install を実行
     sudo make -j$(nproc)
     sudo make install
     sudo make altinstall

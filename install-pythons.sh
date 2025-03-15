@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Python のバージョンリスト
-PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12")
+PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13" "3.14")
+# curl -s https://www.python.org/ftp/python/ | grep -oP '3\.\d+\.\d+' | sort -V | awk -F. '{latest[$1"."$2]=$0} END {count=0; for (v in latest) {print latest[v]; count++; if (count==10) break}}'
 
 # Python のインストールディレクトリ
 INSTALL_DIR="/usr/local/python"

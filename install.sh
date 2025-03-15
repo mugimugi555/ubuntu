@@ -20,6 +20,9 @@ gsettings set org.gnome.desktop.session idle-delay 0                        ;
 gsettings set org.gnome.settings-daemon.plugins.power idle-dim false        ;
 gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 30 ;
 
+# apt config
+echo 'APT::Get::Always-Include-Phased-Updates "true";' | sudo tee /etc/apt/apt.conf.d/99include-phased-updates
+
 #-----------------------------------------------------------------------------------------------------------------------
 # sudo time out
 #-----------------------------------------------------------------------------------------------------------------------

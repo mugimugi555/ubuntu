@@ -1,23 +1,57 @@
 #!/bin/bash
 
-# 必要なパッケージをインストール
+# スクリプトを root で実行する必要がある
+if [[ $EUID -ne 0 ]]; then
+    echo "このスクリプトは root 権限が必要です。sudo をつけて実行してください。" >&2
+    exit 1
+fi
+
 echo "🔹 必要なパッケージをインストール中..."
 sudo apt update
-sudo apt install -y aria2 curl git software-properties-common
+sudo apt install -y curl git software-properties-common
 
-# `apt-fast` を GitHub からダウンロード & インストール
-echo "🔹 apt-fast を GitHub からインストール..."
-cd /usr/local/src
-sudo git clone https://github.com/ilikenwf/apt-fast.git
-cd apt-fast
+# Ubuntu バージョンを取得
+UBUNTU_VERSION=$(lsb_release -rs)
+UBUNTU_CODENAME=$(lsb_release -cs)
 
-# `apt-fast` をシステムにインストール
-sudo install -m 755 apt-fast /usr/local/bin/
-sudo install -m 755 apt-fast.conf /etc/
-sudo install -m 755 man/apt-fast.8 /usr/share/man/man8/
+# PPA に Ubuntu のバージョンが対応しているか確認する関数
+check_ppa_support() {
+    local ppa_url="http://ppa.launchpad.net/apt-fast/stable/ubuntu/dists/$1/"
+    if curl --head --silent --fail "$ppa_url" > /dev/null; then
+        return 0  # PPA が存在する場合
+    else
+        return 1  # PPA が存在しない場合
+    fi
+}
 
-# シンボリックリンクを作成
-sudo ln -sf /usr/local/bin/apt-fast /usr/bin/apt-fast
+echo "🔹 Ubuntu $UBUNTU_VERSION ($UBUNTU_CODENAME) の PPA サポートを確認中..."
+
+if check_ppa_support "$UBUNTU_CODENAME"; then
+    echo "✅ PPA が Ubuntu $UBUNTU_VERSION に対応しています。"
+
+    # PPA を追加し、apt-fast をインストール
+    echo "📥 apt-fast を PPA からインストール中..."
+    sudo add-apt-repository -y ppa:apt-fast/stable
+    sudo apt update -y
+    sudo apt install -y apt-fast aria2
+
+else
+    echo "⚠️ PPA が Ubuntu $UBUNTU_VERSION ($UBUNTU_CODENAME) ではサポートされていません。"
+    echo "🔹 GitHub からソースインストールを実行します..."
+
+    # `apt-fast` を GitHub からダウンロード & インストール
+    cd /usr/local/src
+    sudo git clone https://github.com/ilikenwf/apt-fast.git
+    cd apt-fast
+
+    # `apt-fast` をシステムにインストール
+    sudo install -m 755 apt-fast /usr/local/bin/
+    sudo install -m 755 apt-fast.conf /etc/
+    sudo install -m 755 man/apt-fast.8 /usr/share/man/man8/
+
+    # シンボリックリンクを作成
+    sudo ln -sf /usr/local/bin/apt-fast /usr/bin/apt-fast
+fi
 
 # `apt-fast` の設定ファイルを作成・更新
 echo "🔹 apt-fast の設定を適用..."
@@ -36,24 +70,6 @@ MIRRORS=(
 )
 EOF
 
-# `apt` の並列ダウンロードを有効化
-echo "🔹 apt の並列ダウンロードを有効化..."
-sudo mkdir -p /etc/apt/apt.conf.d
-cat <<EOF | sudo tee /etc/apt/apt.conf.d/99parallel
-# apt の並列ダウンロード設定
-APT::Acquire::Queue-Mode "access";
-APT::Acquire::Retries "3";
-APT::Get::AllowUnauthenticated "true";
-Acquire::http { Pipeline-Depth "5"; };
-Acquire::Retries "5";
-EOF
-
-# 設定が反映されたか確認
-echo "🔹 apt-fast の設定:"
-cat /etc/apt-fast.conf
-echo "🔹 apt の並列ダウンロード設定:"
-cat /etc/apt/apt.conf.d/99parallel
-
 # `.bashrc` にエイリアスを追加（重複を防ぐ）
 BASHRC_FILE="$HOME/.bashrc"
 ALIAS_CMD="alias apt='function _apt() { case \"\$1\" in install|update|upgrade|dist-upgrade|full-upgrade) apt-fast \"\$@\";; *) command apt \"\$@\";; esac; }; _apt'"
@@ -69,7 +85,7 @@ fi
 echo "🔄 エイリアスを適用中..."
 source "$BASHRC_FILE"
 
-echo "✅ apt-fast のソースインストール & apt の並列化が完了しました！"
+echo "✅ apt-fast のインストール & apt の並列化が完了しました！"
 echo "🔹 高速ダウンロードの例:"
-echo "   sudo apt-fast install <package-name>"
+echo "   sudo apt install <package-name>  # 自動的に apt-fast を使用"
 echo "   sudo apt update && sudo apt upgrade"

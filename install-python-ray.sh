@@ -1,35 +1,36 @@
 #!/bin/bash
 
 # === 設定 ===
-SERVER_IP="192.168.1.100"  # 🔹 サーバーの IP を変更してください
-SSH_USER="your_user"       # 🔹 SSH ログインユーザー
-SSH_KEY="$HOME/.ssh/id_rsa"  # 🔹 SSH 秘密鍵のパス
+SERVER_IP="192.168.1.100"  # 🔹 サーバーの IP アドレスに変更
 PYTHON_VERSION="3.10"
 VENV_DIR="$HOME/python_venvs"
 VENV_PATH="$VENV_DIR/python$PYTHON_VERSION-venv"
-AUTOSSH_LOG="$HOME/autossl_ray.log"
 
-# === 必要なパッケージのインストール ===
-install_packages() {
-    echo "🔹 必要なパッケージをインストール中..."
-    sudo apt update
-    sudo apt install -y python3-pip python3-venv autossh
+# === Python 3.10 の存在確認 ===
+check_python_version() {
+    echo "🔹 `apt search` で Python 3.10 の存在を確認します..."
+
+    # 🔹 `apt search` で Python 3.10 を検索
+    if ! apt search "^python3.10$" 2>/dev/null | grep -q "^python3.10"; then
+        echo -e "\n❌ Python 3.10 が見つかりません！"
+        echo -e "   \e[1;31m手動で Python 3.10 をソースからビルドするか、"
+        echo -e "   Ubuntu の公式リポジトリが更新されるのを待ってください。\e[0m"
+        exit 1
+    else
+        echo "✅ Python 3.10 はシステムに存在します。続行します。"
+    fi
 }
 
 # === サーバー側のセットアップ ===
 setup_server() {
     echo "🔹 サーバー: Python と Ray を仮想環境でセットアップ中..."
 
-    # 必要なパッケージをインストール
-    install_packages
-
     # Python 3.10 の確認
-    if ! python3.10 --version &>/dev/null; then
-        echo "⚠️ Python 3.10 が見つかりません。インストールします..."
-        sudo apt install -y python3.10 python3.10-venv python3.10-dev
-    else
-        echo "✅ Python 3.10 はインストール済みです。"
-    fi
+    check_python_version
+
+    # 必要なパッケージをインストール
+    sudo apt update
+    sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip
 
     # 仮想環境の作成
     mkdir -p "$VENV_DIR"
@@ -56,10 +57,6 @@ setup_server() {
     ray stop  # 既存の Ray を停止
     ray start --head --port=6379 --dashboard-port=8265
 
-    # `autossh` をバックグラウンドで実行
-    echo "🔹 autossh を設定してリモート接続を自動化..."
-    nohup autossh -M 0 -f -N -R 6379:localhost:6379 -R 8265:localhost:8265 "$SSH_USER@$SERVER_IP" -i "$SSH_KEY" &> "$AUTOSSH_LOG" &
-
     deactivate
 
     echo "✅ サーバーのセットアップが完了しました！"
@@ -69,8 +66,12 @@ setup_server() {
 setup_client() {
     echo "🔹 クライアント: Python 仮想環境をセットアップ中..."
 
+    # Python 3.10 の確認
+    check_python_version
+
     # 必要なパッケージをインストール
-    install_packages
+    sudo apt update
+    sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip
 
     # 仮想環境の作成
     mkdir -p "$VENV_DIR"
@@ -81,7 +82,7 @@ setup_client() {
         echo "✅ 既存の仮想環境が見つかりました: $VENV_PATH"
     fi
 
-    # 仮想環境をアクティベート
+    # 仮想環境のアクティベート
     source "$VENV_PATH/bin/activate"
 
     # pip の更新
@@ -92,14 +93,10 @@ setup_client() {
     echo "🔹 Ray をインストール..."
     pip install "ray[default]" --ignore-installed
 
-    # SSHポートフォワーディングを開始
-    echo "🔹 autossh を使ってリモート Ray に接続..."
-    nohup autossh -M 0 -f -N -L 6379:localhost:6379 -L 8265:localhost:8265 "$SSH_USER@$SERVER_IP" -i "$SSH_KEY" &> "$AUTOSSH_LOG" &
-
-    # Ray に接続
-    echo "🔹 Ray クラスターヘッドノードに接続..."
+    # サーバーに接続
+    echo "🔹 Ray クラスターヘッドノードに接続: $SERVER_IP"
     ray stop
-    ray start --address=localhost:6379
+    ray start --address="$SERVER_IP:6379"
 
     # 🔹 CUDA のバージョンを調べる
     echo "🔹 CUDA のバージョンを取得..."

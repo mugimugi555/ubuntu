@@ -8,10 +8,27 @@ VENV_PATH="$VENV_DIR/python$PYTHON_VERSION-venv"
 
 # === Python 3.10 の存在確認 ===
 check_python_version() {
-    if ! apt search "^python3.10$" 2>/dev/null | grep -q "^python3.10"; then
-        echo -e "\n❌ Python 3.10 が見つかりません！"
-        exit 1
+    echo "🔹 Python 3.10 の存在を確認中..."
+
+    # 🔹 既に Python 3.10 がインストールされているか確認
+    if python3.10 --version &>/dev/null; then
+        echo "✅ Python 3.10 は既にインストールされています。"
+        return 0
     fi
+
+    # 🔹 `apt search` で Python 3.10 のパッケージを探す
+    if apt search "^python3.10$" 2>/dev/null | grep -q "^python3.10"; then
+        echo "⚠️ Python 3.10 がシステムに見つかりませんでした。インストールします..."
+        sudo apt update
+        sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip
+        return 0
+    fi
+
+    # 🔹 Python 3.10 が見つからない場合のエラーメッセージ
+    echo -e "\n❌ Python 3.10 が見つかりません！"
+    echo -e "   \e[1;31m手動で Python 3.10 をソースからビルドするか、"
+    echo -e "   Ubuntu の公式リポジトリが更新されるのを待ってください。\e[0m"
+    exit 1
 }
 
 # === クライアント側のセットアップ ===
@@ -20,10 +37,6 @@ setup_client() {
 
     # Python 3.10 の確認
     check_python_version
-
-    # 必要なパッケージをインストール
-    sudo apt update
-    sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip
 
     # 仮想環境の作成
     mkdir -p "$VENV_DIR"

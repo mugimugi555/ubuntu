@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# スクリプトを root で実行する必要がある
-if [[ $EUID -ne 0 ]]; then
-    echo "このスクリプトは root 権限が必要です。sudo をつけて実行してください。" >&2
-    exit 1
-fi
-
 echo "🔹 必要なパッケージをインストール中..."
 sudo apt update
 sudo apt install -y curl git software-properties-common debconf-utils

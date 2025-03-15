@@ -35,10 +35,12 @@ setup_client() {
 
     # 🔹 Ray の接続可否とステータス取得
     echo "🔹 Ray クラスターステータスを取得..."
-    python - <<EOF
+    SERVER_IP=$SERVER_IP python - <<EOF
+import os
 import ray
 
 try:
+    SERVER_IP = os.environ.get("SERVER_IP", "127.0.0.1")  # 環境変数から取得
     ray.init(address="auto")
     
     print("\n✅ Ray クラスターステータス:")

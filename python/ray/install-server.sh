@@ -9,13 +9,11 @@ VENV_PATH="$VENV_DIR/python$PYTHON_VERSION-venv"
 check_python_version() {
     echo "🔹 Python 3.10 の存在を確認中..."
 
-    # 🔹 既に Python 3.10 がインストールされているか確認
     if python3.10 --version &>/dev/null; then
         echo "✅ Python 3.10 は既にインストールされています。"
         return 0
     fi
 
-    # 🔹 `apt search` で Python 3.10 のパッケージを探す
     if apt search "^python3.10$" 2>/dev/null | grep -q "^python3.10"; then
         echo "⚠️ Python 3.10 がシステムに見つかりませんでした。インストールします..."
         sudo apt update
@@ -23,7 +21,6 @@ check_python_version() {
         return 0
     fi
 
-    # 🔹 Python 3.10 が見つからない場合のエラーメッセージ
     echo -e "\n❌ Python 3.10 が見つかりません！"
     echo -e "   \e[1;31m手動で Python 3.10 をソースからビルドするか、"
     echo -e "   Ubuntu の公式リポジトリが更新されるのを待ってください。\e[0m"
@@ -58,11 +55,29 @@ setup_server() {
     # 🔹 CUDA の確認
     echo "🔹 CUDA のバージョンを取得..."
     CUDA_VERSION=$(python -c "import torch; print(torch.version.cuda if torch.cuda.is_available() else 'cpu')")
+    
     if [ "$CUDA_VERSION" = "cpu" ]; then
         echo "❌ CUDA が見つかりません！リモート GPU の使用には CUDA が必要です。"
         exit 1
     fi
+
     echo "✅ サーバーの CUDA バージョン: $CUDA_VERSION"
+
+    # 🔹 PyTorch のインストール
+    if [ "$CUDA_VERSION" = "cpu" ]; then
+        echo "🔹 CPU 版の PyTorch をインストール..."
+        pip install torch torchvision torchaudio
+    else
+        echo "🔹 CUDA ${CUDA_VERSION} に対応する PyTorch をインストール..."
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu${CUDA_VERSION//./}
+    fi
+
+    # 🔹 `torch` のインストール確認
+    if ! python -c "import torch" &>/dev/null; then
+        echo "❌ PyTorch のインストールに失敗しました！"
+        exit 1
+    fi
+    echo "✅ PyTorch のインストールが完了しました！"
 
     # 🔹 Ray クラスターモードのセットアップ
     echo "🔹 Ray クラスターモードをセットアップ..."

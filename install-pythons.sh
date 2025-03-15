@@ -11,7 +11,7 @@ PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
 
 # 必要なパッケージをインストール
 echo "🔹 必要なパッケージをインストール中..."
-sudo apt update
+sudo apt update -y
 sudo apt install -y \
     build-essential \
     libssl-dev zlib1g-dev \
@@ -21,15 +21,15 @@ sudo apt install -y \
     curl libbz2-dev liblzma-dev \
     tk-dev libexpat1-dev \
     libgdbm-compat-dev libuuid1 uuid-dev \
-    libffi-dev software-properties-common
+    software-properties-common
 
 # 🔹 PPA の追加を試みる
 echo "🔹 PPA の追加を試行中..."
 if sudo add-apt-repository -y ppa:deadsnakes/ppa; then
     echo "✅ PPA が追加されました。"
-    sudo apt update
+    sudo apt update -y
 else
-    echo "⚠️ PPA の追加に失敗しました。"
+    echo "⚠️ PPA の追加に失敗しました。APT からのインストールは試行しません。"
 fi
 
 # インストールディレクトリを作成
@@ -45,11 +45,10 @@ for version in "${PYTHON_VERSIONS[@]}"; do
         sudo apt install -y "python$version" "python$version-venv" "python$version-dev"
         continue
     else
-        echo "⚠️ Python $version は APT で見つかりません。"
+        echo "⚠️ Python $version は APT で見つかりません。ソースビルドを試みます..."
     fi
 
     # 🔹 ソースからビルド
-    echo "🔹 Python $version をソースからビルド中..."
     full_version=$(curl -s https://www.python.org/ftp/python/ | grep -oP "$version\.\d+" | tail -1)
     if [ -z "$full_version" ]; then
         echo "❌ Python $version の最新バージョンが取得できませんでした。スキップします。"
@@ -92,14 +91,17 @@ echo "🔹 仮想環境の作成を開始します..."
 for version in "${PYTHON_VERSIONS[@]}"; do
     VENV_PATH="$VENV_DIR/python$version-venv"
 
-    if [ -x "/usr/local/bin/python$version" ]; then
+    # Python の実行ファイルのパスを取得
+    PYTHON_PATH=$(which python$version 2>/dev/null || echo "")
+
+    if [ -x "$PYTHON_PATH" ]; then
         echo "🔹 Python $version 用の仮想環境を作成: $VENV_PATH"
 
         # 仮想環境を作成
-        "/usr/local/bin/python$version" -m venv "$VENV_PATH"
+        "$PYTHON_PATH" -m venv "$VENV_PATH"
 
         # 仮想環境を有効化して pip を最新に更新
-        source "$VENV_PATH/bin/activate"
+        . "$VENV_PATH/bin/activate"
         pip install --upgrade pip setuptools wheel
         deactivate
 

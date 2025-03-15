@@ -6,9 +6,26 @@ PYTHON_VERSION="3.10"
 VENV_DIR="$HOME/python_venvs"
 VENV_PATH="$VENV_DIR/python$PYTHON_VERSION-venv"
 
+# === PPA の追加を Ubuntu のバージョンで判定 ===
+add_ppa_if_possible() {
+    if [ -x "$(command -v lsb_release)" ]; then
+        UBUNTU_VERSION=$(lsb_release -sr | cut -d'.' -f1)
+        if [ "$UBUNTU_VERSION" -lt 25 ]; then
+            echo "🔹 PPA を追加します (Ubuntu $UBUNTU_VERSION)..."
+            sudo add-apt-repository -y ppa:deadsnakes/ppa
+            sudo apt update
+        else
+            echo "⚠️ PPA は Ubuntu 25 以降では利用できません。スキップします。"
+        fi
+    fi
+}
+
 # === サーバー側のセットアップ ===
 setup_server() {
     echo "🔹 サーバー: Python と Ray を仮想環境でセットアップ中..."
+
+    # PPA の追加 (Ubuntu 25 以降はスキップ)
+    add_ppa_if_possible
 
     # 必要なパッケージをインストール
     sudo apt update
@@ -44,6 +61,7 @@ setup_server() {
 
     # Ray クラスターモードのセットアップ
     echo "🔹 Ray クラスターモードをセットアップ..."
+    ray stop  # 既存の Ray を停止
     ray start --head --port=6379 --dashboard-port=8265
 
     deactivate
@@ -54,6 +72,9 @@ setup_server() {
 # === クライアント側のセットアップ ===
 setup_client() {
     echo "🔹 クライアント: Python 仮想環境をセットアップ中..."
+
+    # PPA の追加 (Ubuntu 25 以降はスキップ)
+    add_ppa_if_possible
 
     # 必要なパッケージをインストール
     sudo apt update
@@ -81,7 +102,38 @@ setup_client() {
 
     # サーバーに接続
     echo "🔹 Ray クラスターヘッドノードに接続: $SERVER_IP"
+    ray stop
     ray start --address="$SERVER_IP:6379"
+
+    # 🔹 CUDA のバージョンを調べる
+    echo "🔹 CUDA のバージョンを取得..."
+    CUDA_VERSION=$(python - <<EOF
+import torch
+if torch.cuda.is_available():
+    capability = torch.cuda.get_device_capability()
+    major, minor = capability
+    if major == 7:
+        print("cu102")  # CUDA 10.2
+    elif major == 8:
+        print("cu118")  # CUDA 11.8
+    elif major == 9:
+        print("cu121")  # CUDA 12.1
+    else:
+        print("cpu")  # CUDA 不明なら CPU 版
+else:
+    print("cpu")
+EOF
+)
+    echo "🔹 CUDA バージョン: $CUDA_VERSION"
+
+    # 🔹 PyTorch のインストール
+    if [ "$CUDA_VERSION" = "cpu" ]; then
+        echo "🔹 CPU 版の PyTorch をインストール..."
+        pip install torch torchvision torchaudio
+    else
+        echo "🔹 CUDA ${CUDA_VERSION} に対応する PyTorch をインストール..."
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$CUDA_VERSION
+    fi
 
     # 🔹 GPU の利用可否を確認
     echo "🔹 GPU の使用可否をテスト..."
@@ -109,7 +161,7 @@ EOF
 # === メニュー選択 ===
 echo "🔹 どちらのセットアップを実行しますか？"
 echo "   1) サーバーのセットアップ"
-echo "   2) クライアントのセットアップ（GPU テスト付き）"
+echo "   2) クライアントのセットアップ（CUDA バージョン取得 & GPU テスト付き）"
 read -p "選択してください (1/2): " choice
 
 case "$choice" in

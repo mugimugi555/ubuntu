@@ -27,6 +27,19 @@ check_python_version() {
     exit 1
 }
 
+# === CUDA バージョンの取得 ===
+get_cuda_version() {
+    echo "🔹 `nvcc` で CUDA のバージョンを取得..."
+    if command -v nvcc &>/dev/null; then
+        CUDA_VERSION=$(nvcc --version | grep "release" | awk '{print $NF}' | sed -E 's/[V,]//g' | cut -d'.' -f1,2)
+        CUDA_VERSION="cu$(echo $CUDA_VERSION | tr -d '.')"
+        echo "✅ 正しく検出された CUDA バージョン: $CUDA_VERSION"
+    else
+        echo "❌ `nvcc` コマンドが見つかりません！CUDA が正しくインストールされているか確認してください。"
+        exit 1
+    fi
+}
+
 # === Ray サーバーのセットアップ ===
 setup_server() {
     echo "🔹 サーバー: Python と Ray を仮想環境でセットアップ中..."
@@ -52,25 +65,12 @@ setup_server() {
     # Ray のインストール
     pip install "ray[default]" --ignore-installed
 
-    # 🔹 CUDA の確認
-    echo "🔹 CUDA のバージョンを取得..."
-    CUDA_VERSION=$(python -c "import torch; print(torch.version.cuda if torch.cuda.is_available() else 'cpu')")
-    
-    if [ "$CUDA_VERSION" = "cpu" ]; then
-        echo "❌ CUDA が見つかりません！リモート GPU の使用には CUDA が必要です。"
-        exit 1
-    fi
-
-    echo "✅ サーバーの CUDA バージョン: $CUDA_VERSION"
+    # CUDA の取得
+    get_cuda_version
 
     # 🔹 PyTorch のインストール
-    if [ "$CUDA_VERSION" = "cpu" ]; then
-        echo "🔹 CPU 版の PyTorch をインストール..."
-        pip install torch torchvision torchaudio
-    else
-        echo "🔹 CUDA ${CUDA_VERSION} に対応する PyTorch をインストール..."
-        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu${CUDA_VERSION//./}
-    fi
+    echo "🔹 CUDA ${CUDA_VERSION} に対応する PyTorch をインストール..."
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$CUDA_VERSION
 
     # 🔹 `torch` のインストール確認
     if ! python -c "import torch" &>/dev/null; then

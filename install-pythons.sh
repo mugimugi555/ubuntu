@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# Python のバージョンリスト
-PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
-# curl -s https://www.python.org/ftp/python/ | grep -oP '3\.\d+\.\d+' | sort -V | awk -F. '{latest[$1"."$2]=$0} END {count=0; for (v in latest) {print latest[v]; count++; if (count==10) break}}'
-
 # Python のインストールディレクトリ
 INSTALL_DIR="/usr/local/python"
 
 # 仮想環境のディレクトリ
 VENV_DIR="$HOME/python_venvs"
+
+# 固定の Python バージョンリスト
+PYTHON_VERSIONS=("3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
 
 # 必要なパッケージをインストール
 echo "🔹 必要なパッケージをインストール中..."
@@ -21,27 +20,23 @@ sudo apt install -y \
     libreadline-dev libffi-dev \
     curl libbz2-dev liblzma-dev \
     tk-dev libexpat1-dev \
-    libgdbm-compat-dev libuuid1 uuid-dev
+    libgdbm-compat-dev libuuid1 uuid-dev \
+    libffi-dev
 
-# `libmpdec-dev` の存在を確認し、インストール
+# `libmpdec` の存在を確認し、インストール
 if apt-cache search libmpdec | grep -q "libmpdec"; then
-    echo "✅ libmpdec が見つかりました。APT でインストールします。"
+    echo "✅ `libmpdec` が見つかりました。APT でインストールします。"
     sudo apt install -y libmpdec3
 else
-    echo "⚠️ libmpdec が見つかりません。ソースからビルドします。"
-    
-    # ソースコードをダウンロードしてビルド
+    echo "⚠️ `libmpdec` が見つかりません。ソースからビルドします。"
     cd /usr/src
     sudo curl -O https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz
     sudo tar -xvf mpdecimal-2.5.1.tar.gz
     cd mpdecimal-2.5.1
-
-    echo "🔹 `libmpdec` をコンパイル中..."
     sudo ./configure --prefix=/usr/local
     sudo make -j$(nproc)
     sudo make install
-
-    echo "✅ libmpdec のインストールが完了しました。"
+    echo "✅ `libmpdec` のインストールが完了しました。"
 fi
 
 # インストールディレクトリを作成

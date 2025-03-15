@@ -23,12 +23,12 @@ sudo apt install -y \
     libgdbm-compat-dev libuuid1 uuid-dev \
     libffi-dev
 
-# `libmpdec` の存在を確認し、インストール
+# libmpdec の存在を確認し、インストール
 if apt-cache search libmpdec | grep -q "libmpdec"; then
-    echo "✅ `libmpdec` が見つかりました。APT でインストールします。"
+    echo "✅ libmpdec が見つかりました。APT でインストールします。"
     sudo apt install -y libmpdec3
 else
-    echo "⚠️ `libmpdec` が見つかりません。ソースからビルドします。"
+    echo "⚠️ libmpdec が見つかりません。ソースからビルドします。"
     cd /usr/src
     sudo curl -O https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz
     sudo tar -xvf mpdecimal-2.5.1.tar.gz
@@ -36,7 +36,16 @@ else
     sudo ./configure --prefix=/usr/local
     sudo make -j$(nproc)
     sudo make install
-    echo "✅ `libmpdec` のインストールが完了しました。"
+
+    # 🔹 ldconfig を実行してシステムに認識させる
+    sudo ldconfig
+
+    # 🔍 libmpdec のインストールを確認
+    if ! ls -l /usr/local/lib | grep -q "libmpdec.so"; then
+        echo "❌ libmpdec.so のインストールが正しく完了していません！"
+        exit 1
+    fi
+    echo "✅ libmpdec.so のインストールが完了しました。"
 fi
 
 # インストールディレクトリを作成
@@ -67,10 +76,10 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     sudo ./configure --enable-optimizations --enable-shared --prefix="$INSTALL_DIR/$version" \
         --disable-test-modules --without-doc-strings
 
-    # `make install` を明示的に実行
+    # make install を明示的に実行
     sudo make -j$(nproc)
     sudo make install
-    sudo make altinstall  # テストを省略して高速インストール
+    sudo make altinstall
 
     # シンボリックリンクを作成
     sudo ln -sf "$INSTALL_DIR/$version/bin/python$version" "/usr/local/bin/python$version"

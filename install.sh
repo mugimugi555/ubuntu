@@ -20,6 +20,9 @@ gsettings set org.gnome.desktop.session idle-delay 0                        ;
 gsettings set org.gnome.settings-daemon.plugins.power idle-dim false        ;
 gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 30 ;
 
+# apt config
+echo 'APT::Get::Always-Include-Phased-Updates "true";' | sudo tee /etc/apt/apt.conf.d/99include-phased-updates
+
 #-----------------------------------------------------------------------------------------------------------------------
 # sudo time out
 #-----------------------------------------------------------------------------------------------------------------------
@@ -47,6 +50,7 @@ sudo apt upgrade -y ;
 
 # exfat-utils 
 sudo apt install -y emacs-nox htop curl git axel samba openssh-server net-tools exfat-fuse ffmpeg ibus-mozc imagemagick lame unar vlc ;
+sudo apt install -y ffmpeg yt-dlp
 sudo apt autoremove -y ;
 
 # kdiskmark
@@ -62,6 +66,9 @@ sudo snap connect losslesscut:removable-media ;
 #-----------------------------------------------------------------------------------------------------------------------
 sudo snap install --classic code ;
 sudo snap install --classic gimp ;
+# sudo snap install phpstorm --classic
+# sudo snap install pycharm-community --classic
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # setting jp
@@ -97,6 +104,8 @@ sudo chmod a+rx /usr/local/bin/youtube-dl ;
 #-----------------------------------------------------------------------------------------------------------------------
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_current_amd64.deb ;
 sudo sudo apt install -y ./google-chrome-stable_current_amd64.deb ;
+
+sudo snap install brave ;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # remote desktop
@@ -172,7 +181,7 @@ MYALIAS=$(cat<<TEXT
 # myalias
 alias a="axel -a -n 10"
 alias u='unar'
-alias up='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y'
+alias up='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y ; sudo snap refresh '
 
 TEXT
 )

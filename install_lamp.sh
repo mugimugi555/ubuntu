@@ -1,43 +1,58 @@
 #!/bin/bash
 
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install_lamp.sh && bash install_lamp.sh ;
+#-----------------------------------------------------------------------------------------------------------------------
+# LAMP 環境の最新 PHP をインストールするスクリプト
+#-----------------------------------------------------------------------------------------------------------------------
+
+echo "✅ Ubuntu LAMP スタック & 最新 PHP インストール開始..."
 
 #-----------------------------------------------------------------------------------------------------------------------
-# add php repository
+# 必要なリポジトリを追加
 #-----------------------------------------------------------------------------------------------------------------------
-sudo apt update ;
-sudo apt upgrade -y ;
-sudo apt install -y ca-certificates apt-transport-https software-properties-common wget curl lsb-release ;
-sudo add-apt-repository ppa:ondrej/php -y ;
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ca-certificates apt-transport-https software-properties-common wget curl lsb-release
+
+# PHP の公式リポジトリ追加（最新バージョンを取得可能にする）
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
 
 #-----------------------------------------------------------------------------------------------------------------------
-# install apache php mysql
+# 最新の PHP のバージョンを取得
 #-----------------------------------------------------------------------------------------------------------------------
-sudo apt update ;
-sudo apt upgrade -y ;
+LATEST_PHP_VERSION=$(apt-cache search php | grep -oP '^php[0-9]+\.[0-9]+' | sort -V | tail -n 1 | sed 's/php//')
+echo "✅ 最新の PHP バージョン: $LATEST_PHP_VERSION"
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Apache, 最新 PHP, MySQL をインストール
+#-----------------------------------------------------------------------------------------------------------------------
 sudo apt install -y \
   apache2 \
-  php php-cli php-fpm php-mbstring php-mysql php-curl php-gd php-curl php-zip php-xml \
-  mariadb-server ;
+  php$LATEST_PHP_VERSION php$LATEST_PHP_VERSION-fpm \
+  php$LATEST_PHP_VERSION-mbstring php$LATEST_PHP_VERSION-mysql php$LATEST_PHP_VERSION-curl \
+  php$LATEST_PHP_VERSION-gd php$LATEST_PHP_VERSION-zip php$LATEST_PHP_VERSION-xml \
+  mariadb-server
 
 #-----------------------------------------------------------------------------------------------------------------------
-# enable php-fpm
+# Apache で PHP-FPM を有効化
 #-----------------------------------------------------------------------------------------------------------------------
-sudo apt install -y libapache2-mod-fcgid ;
-sudo a2enmod proxy_fcgi setenvif ;
-PHPVERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d".") ;
-sudo a2enconf php$PHPVERSION-fpm ;
-sudo systemctl restart apache2 ;
-#sudo systemctl status php$PHPVERSION-fpm ;
+sudo apt install -y libapache2-mod-fcgid
+sudo a2enmod proxy_fcgi setenvif
+sudo a2enconf php$LATEST_PHP_VERSION-fpm
+sudo systemctl restart apache2
 
 #-----------------------------------------------------------------------------------------------------------------------
-# finish
+# テストページの作成
 #-----------------------------------------------------------------------------------------------------------------------
-sudo rm /var/www/html/index.html ;
-echo "<?php phpinfo(); " | sudo tee /var/www/html/index.php ;
-LOCAL_IPADDRESS=`hostname -I | awk -F" " '{print $1}'` ;
-echo "======================================" ;
-echo "visit => http://$LOCAL_IPADDRESS/" ;
-echo "======================================" ;
+sudo rm -f /var/www/html/index.html
+echo "<?php phpinfo();" | sudo tee /var/www/html/index.php > /dev/null
 
-xdg-open http://$LOCAL_IPADDRESS/ &
+LOCAL_IPADDRESS=$(hostname -I | awk '{print $1}')
+echo "======================================"
+echo "🚀 PHP $LATEST_PHP_VERSION がインストールされました！"
+echo "🌐 サイトを開く => http://$LOCAL_IPADDRESS/"
+echo "======================================"
+
+# 自動でブラウザを開く（GUI 環境の場合）
+if command -v xdg-open &> /dev/null; then
+    xdg-open http://$LOCAL_IPADDRESS/ &
+fi

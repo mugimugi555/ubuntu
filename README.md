@@ -1,6 +1,6 @@
 # Ubuntu Setup Scripts
 
-![タイトル画像](assets/images/header.png)
+![タイトル画像](readme/header.png)
 
 このリポジトリは、Ubuntu環境のセットアップや各種ソフトウェアのインストールを自動化するシェルスクリプトを集めたものです。
 各スクリプトは特定の目的に対応しており、必要なものを選択して使用できます。
@@ -65,4 +65,4 @@
 このリポジトリの内容は、特に明記がない限り、MIT ライセンスの下で提供されています。
 詳細は [LICENSE](LICENSE) ファイルをご確認ください。
 
-![タイトル画像](assets/images/footer.png)
+![タイトル画像](readme/footer.png)

@@ -1,5 +1,7 @@
 # Google Gemma 3 シリーズ セットアップ & 実行
 
+![タイトル画像](readme/header.png)
+
 ## 🚀 はじめに
 このリポジトリでは、Google Gemma 3 シリーズのモデルをローカル環境で実行するためのスクリプトを提供します。
 
@@ -89,6 +91,4 @@ huggingface-cli login --token your_huggingface_token
 ## 📜 ライセンス
 このプロジェクトは **MIT License** の下で提供されます。
 
-## 🎉 おわりに
-Gemma 3 シリーズの AI を活用して、楽しい AI 開発をしてください！ 🚀
-
+![タイトル画像](readme/footer.png)

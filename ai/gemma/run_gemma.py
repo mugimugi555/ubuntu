@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import GemmaForCausalLM, AutoTokenizer, GemmaConfig
 import torch
 
 # === モデル名を自動設定 ===
@@ -31,7 +31,15 @@ if not MODEL_NAME:
 # モデルロードの開始
 print(f"🔹 モデルをロード: {MODEL_NAME}", file=sys.stderr)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16, device_map="auto")
+
+# GemmaConfig の vocab_size に対応する修正
+config = GemmaConfig.from_pretrained(MODEL_NAME)
+if not hasattr(config, "vocab_size"):
+    config.vocab_size = 32000  # Gemma のデフォルト vocab_size を設定
+
+model = GemmaForCausalLM.from_pretrained(
+    MODEL_NAME, config=config, torch_dtype=torch.float16, device_map="auto"
+)
 
 # 標準入力からプロンプトを取得
 prompt = sys.stdin.read().strip()
@@ -44,13 +52,4 @@ inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
 
 # 応答の生成
 output = model.generate(**inputs, max_length=100)
-response_text = tokenizer.decode(output[0], skip_special_tokens=True)
-
-# JSON 出力
-response_json = {
-    "model": MODEL_NAME,
-    "prompt": prompt,
-    "response": response_text
-}
-
-print(json.dumps(response_json, ensure_ascii=False, indent=4))
+response_text = tokenizer.decode(o

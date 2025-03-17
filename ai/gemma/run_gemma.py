@@ -22,7 +22,7 @@ def list_local_models():
     return {"local_models": models} if models else {"error": "ローカルに保存されている Hugging Face モデルはありません。"}
 
 # モデルロードの開始
-print(f"🔹 モデルをロード: {MODEL_NAME}", file=sys.stderr)
+# print(f"🔹 モデルをロード: {MODEL_NAME}", file=sys.stderr)
 
 try:
     # 設定をロードして `vocab_size` があるか確認
@@ -73,7 +73,7 @@ response_json = {
 }
 
 # 通常のテキスト出力
-print("Gemmaの応答:", response_text)
+# print("Gemmaの応答:", response_text)
 
 # JSON 形式での出力
 print(json.dumps(response_json, ensure_ascii=False, indent=4))

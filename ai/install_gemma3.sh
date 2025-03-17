@@ -83,7 +83,18 @@ fi
 echo -n "$HF_TOKEN" > "$HF_HOME/token"
 huggingface-cli login --token "$HF_TOKEN"
 
-# 5. Python 仮想環境の作成
+# 5. モデル利用規約（アグリメント）の確認
+echo "🔹 モデルの利用規約を確認中..."
+AGREEMENT_CHECK=$(curl -s -H "Authorization: Bearer $HF_TOKEN" "https://huggingface.co/api/models/$MODEL_NAME")
+if echo "$AGREEMENT_CHECK" | grep -q "error"; then
+    echo "⚠️ モデルの利用規約に同意していません。"
+    echo "🌐 モデルの利用許可ページを開きます..."
+    xdg-open "https://huggingface.co/$MODEL_NAME"
+    echo "🔹 ページを開いたら「Access Model」をクリックして承諾してください。"
+    exit 1
+fi
+
+# 6. Python 仮想環境の作成
 if [ ! -d "$PYTHON_ENV_DIR" ]; then
     echo "🔹 Python 仮想環境を作成中..."
     python3 -m venv "$PYTHON_ENV_DIR"
@@ -94,18 +105,18 @@ fi
 # 仮想環境を有効化
 source "$PYTHON_ENV_DIR/bin/activate"
 
-# 6. 必要な Python ライブラリのインストール
+# 7. 必要な Python ライブラリのインストール
 echo "🔹 必要な Python ライブラリをインストール中..."
 pip install --upgrade pip setuptools wheel
 pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/$CUDA_VERSION"
-pip install transformers huggingface_hub accelerate
+pip install --upgrade git+https://github.com/huggingface/transformers.git
+pip install huggingface_hub accelerate
 
-# 7. Hugging Face のモデルをダウンロード
+# 8. Hugging Face のモデルをダウンロード
 echo "🔹 Google Gemma 3 のモデルをダウンロード中..."
-pip install "huggingface_hub[hf_transfer]"
 HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download --token "$HF_TOKEN" $MODEL_NAME
 
-# 8. Python スクリプトの作成
+# 9. Python スクリプトの作成
 echo "🔹 Google Gemma 3 を実行するスクリプトを作成..."
 cat <<EOF > run_gemma.py
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -124,7 +135,7 @@ response = tokenizer.decode(output[0], skip_special_tokens=True)
 print("Gemmaの応答:", response)
 EOF
 
-# 9. 実行テスト
+# 10. 実行テスト
 echo "🔹 Google Gemma 3 の動作確認を開始..."
 python run_gemma.py
 

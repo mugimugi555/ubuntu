@@ -1,11 +1,14 @@
 import json
 import os
 import sys
+import re
+import time
+from datetime import datetime
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 import torch
 
 # === 設定（使用するモデルを明示的に指定） ===
-MODEL_NAME = "google/gemma-3-1b-it"  # 必要なモデルを設定
+MODEL_NAME = "google/gemma-3-1b-it"  # モデル名を明示的に指定
 HF_CACHE_DIR = os.path.expanduser("~/.cache/huggingface/hub")
 
 def list_local_models():
@@ -21,8 +24,12 @@ def list_local_models():
 
     return {"local_models": models} if models else {"error": "ローカルに保存されている Hugging Face モデルはありません。"}
 
-# モデルロードの開始
-# print(f"🔹 モデルをロード: {MODEL_NAME}", file=sys.stderr)
+def clean_response(response):
+    """ 応答のテキストを整形（不要な `**` や改行を除去）"""
+    response = re.sub(r'(\n\*\*)+', '', response)  # `\n**\n**...` を削除
+    response = re.sub(r'\*\*+', '', response)  # 残っている `**` の連続を削除
+    response = re.sub(r'\n+', '\n', response).strip()  # 連続する改行を1つにする
+    return response
 
 try:
     # 設定をロードして `vocab_size` があるか確認
@@ -35,7 +42,7 @@ try:
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16, device_map="auto")
 
 except Exception as e:
-    # エラーメッセージを JSON 形式で出力
+    # エラーメッセージを JSON 形式で出力（他のテキスト出力なし）
     error_message = {
         "error": f"モデルのロードに失敗しました: {MODEL_NAME}",
         "reason": str(e),
@@ -58,6 +65,9 @@ if not prompt:
     print(json.dumps({"error": "プロンプトが空です。"}))
     sys.exit(1)
 
+# === 応答生成の処理時間を計測 ===
+start_time = time.time()
+
 # 入力をトークン化
 inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
 
@@ -65,15 +75,23 @@ inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
 output = model.generate(**inputs, max_length=100)
 response_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
+# 応答のクリーンアップ
+response_text = clean_response(response_text)
+
+# レスポンスにかかった時間
+response_time = round(time.time() - start_time, 3)  # 秒単位（小数点3桁）
+
+# タイムスタンプを取得（MySQL で管理しやすい形式）
+timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 # JSON 出力フォーマット
 response_json = {
+    "timestamp": timestamp,
     "model": MODEL_NAME,
     "prompt": prompt,
-    "response": response_text
+    "response": response_text,
+    "response_time": response_time  # レスポンス時間（秒）
 }
 
-# 通常のテキスト出力
-# print("Gemmaの応答:", response_text)
-
-# JSON 形式での出力
+# JSON 形式での出力のみ
 print(json.dumps(response_json, ensure_ascii=False, indent=4))

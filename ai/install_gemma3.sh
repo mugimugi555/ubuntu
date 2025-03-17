@@ -21,6 +21,10 @@ MODEL_NAME="google/gemma-3-12b-it"
 CUDA_VERSION=""
 REQUIRED_VRAM_GB=16  # 選択モデルの推定VRAM要件（float16）
 
+# === Hugging Face API トークン設定 ===
+HF_HOME="$HOME/.cache/huggingface"
+HF_TOKEN="YOUR_HF_TOKEN_HERE"  # 必ずアクセストークンを設定
+
 # === CUDA バージョンの取得 ===
 get_cuda_version() {
     echo "🔹 `nvcc` で CUDA のバージョンを取得..."
@@ -52,7 +56,7 @@ echo "🔹 Google Gemma 3 のセットアップを開始します..."
 # 1. 必要なパッケージのインストール
 echo "🔹 必要なパッケージをインストール中..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3 python3-venv python3-pip git curl bc
+sudo apt install -y python3 python3-venv python3-pip git curl bc xdg-utils
 
 # 2. CUDA バージョンの取得
 get_cuda_version
@@ -60,7 +64,26 @@ get_cuda_version
 # 3. VRAM の確認
 check_vram
 
-# 4. Python 仮想環境の作成
+# 4. Hugging Face にログイン（APIキーが必要）
+echo "🔹 Hugging Face の認証を確認中..."
+mkdir -p "$HF_HOME"
+
+if [[ "$HF_TOKEN" == "YOUR_HF_TOKEN_HERE" || -z "$HF_TOKEN" ]]; then
+    echo "⚠️ Hugging Face の API トークンが設定されていません。"
+    echo "🌐 Hugging Face のトークン作成ページを開きます..."
+    xdg-open "https://huggingface.co/settings/tokens"
+
+    read -p "🔑 API トークンを入力してください: " HF_TOKEN
+    if [ -z "$HF_TOKEN" ]; then
+        echo "❌ API トークンが入力されませんでした。スクリプトを終了します。"
+        exit 1
+    fi
+fi
+
+echo -n "$HF_TOKEN" > "$HF_HOME/token"
+huggingface-cli login --token "$HF_TOKEN"
+
+# 5. Python 仮想環境の作成
 if [ ! -d "$PYTHON_ENV_DIR" ]; then
     echo "🔹 Python 仮想環境を作成中..."
     python3 -m venv "$PYTHON_ENV_DIR"
@@ -71,18 +94,18 @@ fi
 # 仮想環境を有効化
 source "$PYTHON_ENV_DIR/bin/activate"
 
-# 5. 必要な Python ライブラリのインストール
+# 6. 必要な Python ライブラリのインストール
 echo "🔹 必要な Python ライブラリをインストール中..."
 pip install --upgrade pip setuptools wheel
 pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/$CUDA_VERSION"
 pip install transformers huggingface_hub accelerate
 
-# 6. Hugging Face のモデルをダウンロード
+# 7. Hugging Face のモデルをダウンロード
 echo "🔹 Google Gemma 3 のモデルをダウンロード中..."
 pip install "huggingface_hub[hf_transfer]"
-HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download $MODEL_NAME
+HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download --token "$HF_TOKEN" $MODEL_NAME
 
-# 7. Python スクリプトの作成
+# 8. Python スクリプトの作成
 echo "🔹 Google Gemma 3 を実行するスクリプトを作成..."
 cat <<EOF > run_gemma.py
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -101,7 +124,7 @@ response = tokenizer.decode(output[0], skip_special_tokens=True)
 print("Gemmaの応答:", response)
 EOF
 
-# 8. 実行テスト
+# 9. 実行テスト
 echo "🔹 Google Gemma 3 の動作確認を開始..."
 python run_gemma.py
 

@@ -4,7 +4,7 @@ set -e  # エラー時にスクリプトを停止
 
 # === 設定 ===
 PYTHON_ENV_DIR="$HOME/venvs/gemma3"
-MODEL_NAME="google/gemma-3-7b"
+MODEL_NAME="google/gemma-3-12b-it"
 CUDA_VERSION=""
 
 # === CUDA バージョンの取得 ===

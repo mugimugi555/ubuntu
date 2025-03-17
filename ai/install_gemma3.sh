@@ -125,20 +125,37 @@ HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download --token "$HF_TOKEN" $MODEL_
 # 8. Python スクリプトの作成
 echo "🔹 Google Gemma 3 を実行するスクリプトを作成..."
 cat <<EOF > run_gemma.py
+import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
+# モデル名
 model_name = "$MODEL_NAME"
+
+# トークナイザーとモデルのロード
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
 
+# 入力プロンプト
 prompt = "こんにちは、自己紹介してください。"
 inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
 
+# 応答の生成
 output = model.generate(**inputs, max_length=100)
-response = tokenizer.decode(output[0], skip_special_tokens=True)
+response_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
-print("Gemmaの応答:", response)
+# JSON 出力フォーマット
+response_json = {
+    "model": model_name,
+    "prompt": prompt,
+    "response": response_text
+}
+
+# 通常のテキスト出力
+print("Gemmaの応答:", response_text)
+
+# JSON 形式での出力
+print(json.dumps(response_json, ensure_ascii=False, indent=4))
 EOF
 
 # 9. 実行テスト

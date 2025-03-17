@@ -3,27 +3,48 @@
 set -e  # エラー時にスクリプトを停止
 
 # ======================================================
-# Google Gemma 3シリーズ対応GPU & 必要VRAM一覧
-# ======================================================
-# | モデル名               | パラメータ数 | 必要VRAM (推定) | 推奨GPU            |
-# |------------------------|-------------|----------------|--------------------|
-# | google/gemma-3-1b-it   | 1B          | 約 4GB         | RTX 3050 以上      |
-# | google/gemma-3-4b-it   | 4B          | 約 8GB         | RTX 3060 以上      |
-# | google/gemma-3-12b-it  | 12B         | 約 16GB        | RTX 3090 / A6000  |
-# | google/gemma-3-27b-it  | 27B         | 約 48GB        | A100 / H100       |
-#
-#  💡 VRAMが足りない場合は 4bit 量子化(QLoRA)などを検討してください。
+# === 設定（変更可能な変数）
 # ======================================================
 
-# === 設定 ===
+# 仮想環境のディレクトリ
 PYTHON_ENV_DIR="$HOME/venvs/gemma3"
-MODEL_NAME="google/gemma-3-12b-it"
-CUDA_VERSION=""
-REQUIRED_VRAM_GB=16  # 選択モデルの推定VRAM要件（float16）
 
-# === Hugging Face API トークン設定 ===
+# Hugging Face API トークン設定
 HF_HOME="$HOME/.cache/huggingface"
 HF_TOKEN="YOUR_HF_TOKEN_HERE"  # 必ずアクセストークンを設定
+
+# ======================================================
+# Google Gemma 3シリーズ対応GPU & 必要VRAM一覧
+# ======================================================
+declare -A GEMMA_MODELS
+GEMMA_MODELS=(
+    ["google/gemma-3-1b-it"]=4
+    ["google/gemma-3-4b-it"]=8
+    ["google/gemma-3-12b-it"]=16
+    ["google/gemma-3-27b-it"]=48
+)
+
+# === VRAM 要件チェック & 適切なモデル選択 ===
+echo "🔹 GPU の VRAM 容量を取得中..."
+AVAILABLE_VRAM_GB=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | awk '{print $1/1024}' | sort -nr | head -n1)
+
+echo "✅ 使用可能な VRAM: ${AVAILABLE_VRAM_GB}GB"
+
+# 使用可能な VRAM に応じて対応するモデルをリストアップ
+echo "🔹 使用可能な Gemma モデル一覧:"
+AVAILABLE_MODELS=()
+for MODEL in "${!GEMMA_MODELS[@]}"; do
+    if (( $(echo "$AVAILABLE_VRAM_GB >= ${GEMMA_MODELS[$MODEL]}" | bc -l) )); then
+        AVAILABLE_MODELS+=("$MODEL")
+        echo "   - $MODEL (推奨 VRAM: ${GEMMA_MODELS[$MODEL]}GB)"
+    fi
+done
+
+# 最適なモデルを自動選択（最大のモデルを選択）
+MODEL_NAME="${AVAILABLE_MODELS[-1]}"
+REQUIRED_VRAM_GB="${GEMMA_MODELS[$MODEL_NAME]}"
+
+echo "✅ 自動選択されたモデル: $MODEL_NAME (推定必要VRAM: ${REQUIRED_VRAM_GB}GB)"
 
 # === CUDA バージョンの取得 ===
 get_cuda_version() {
@@ -38,19 +59,6 @@ get_cuda_version() {
     fi
 }
 
-# === VRAM 要件チェック ===
-check_vram() {
-    echo "🔹 GPU の VRAM 容量を取得中..."
-    AVAILABLE_VRAM_GB=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | awk '{print $1/1024}' | sort -nr | head -n1)
-    
-    if (( $(echo "$AVAILABLE_VRAM_GB < $REQUIRED_VRAM_GB" | bc -l) )); then
-        echo "⚠️ 警告: このモデルには少なくとも ${REQUIRED_VRAM_GB}GB の VRAM が必要ですが、現在の VRAM は ${AVAILABLE_VRAM_GB}GB です。"
-        echo "💡 モデルの量子化（8bit, 4bit）を検討してください。"
-    else
-        echo "✅ 必要な VRAM 容量が確保されています。（${AVAILABLE_VRAM_GB}GB）"
-    fi
-}
-
 echo "🔹 Google Gemma 3 のセットアップを開始します..."
 
 # 1. 必要なパッケージのインストール
@@ -61,10 +69,7 @@ sudo apt install -y python3 python3-venv python3-pip git curl bc xdg-utils
 # 2. CUDA バージョンの取得
 get_cuda_version
 
-# 3. VRAM の確認
-check_vram
-
-# 4. Hugging Face にログイン（APIキーが必要）
+# 3. Hugging Face にログイン（APIキーが必要）
 echo "🔹 Hugging Face の認証を確認中..."
 mkdir -p "$HF_HOME"
 
@@ -83,7 +88,7 @@ fi
 echo -n "$HF_TOKEN" > "$HF_HOME/token"
 huggingface-cli login --token "$HF_TOKEN"
 
-# 5. モデル利用規約（アグリメント）の確認
+# 4. モデル利用規約（アグリメント）の確認
 echo "🔹 モデルの利用規約を確認中..."
 AGREEMENT_CHECK=$(curl -s -H "Authorization: Bearer $HF_TOKEN" "https://huggingface.co/api/models/$MODEL_NAME")
 if echo "$AGREEMENT_CHECK" | grep -q "error"; then
@@ -94,7 +99,8 @@ if echo "$AGREEMENT_CHECK" | grep -q "error"; then
     exit 1
 fi
 
-# 6. Python 仮想環境の作成
+# 5. Python 仮想環境の作成
+PYTHON_ENV_DIR="$HOME/venvs/${MODEL_NAME//\//-}"  # モデル名に応じた仮想環境ディレクトリ
 if [ ! -d "$PYTHON_ENV_DIR" ]; then
     echo "🔹 Python 仮想環境を作成中..."
     python3 -m venv "$PYTHON_ENV_DIR"
@@ -105,18 +111,18 @@ fi
 # 仮想環境を有効化
 source "$PYTHON_ENV_DIR/bin/activate"
 
-# 7. 必要な Python ライブラリのインストール
+# 6. 必要な Python ライブラリのインストール
 echo "🔹 必要な Python ライブラリをインストール中..."
 pip install --upgrade pip setuptools wheel
 pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/$CUDA_VERSION"
 pip install --upgrade git+https://github.com/huggingface/transformers.git
 pip install huggingface_hub accelerate
 
-# 8. Hugging Face のモデルをダウンロード
+# 7. Hugging Face のモデルをダウンロード
 echo "🔹 Google Gemma 3 のモデルをダウンロード中..."
 HF_HUB_ENABLE_HF_TRANSFER=1 huggingface-cli download --token "$HF_TOKEN" $MODEL_NAME
 
-# 9. Python スクリプトの作成
+# 8. Python スクリプトの作成
 echo "🔹 Google Gemma 3 を実行するスクリプトを作成..."
 cat <<EOF > run_gemma.py
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -135,7 +141,7 @@ response = tokenizer.decode(output[0], skip_special_tokens=True)
 print("Gemmaの応答:", response)
 EOF
 
-# 10. 実行テスト
+# 9. 実行テスト
 echo "🔹 Google Gemma 3 の動作確認を開始..."
 python run_gemma.py
 

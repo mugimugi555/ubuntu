@@ -7,7 +7,7 @@
 | ファイル名                    | 内容                                                                 |
 |-----------------------------|----------------------------------------------------------------------|
 | `install_wine.sh`           | WineHQ 本体および必要なパッケージ・フォントのインストールスクリプト。Ubuntu に最適化。 |
-| `install_wine_windows.sh`   | 任意の Windows バージョンに対応した仮想環境を作成（win7 / win10 など）。              |
+| `install_wine_windows.sh`   | 一括で Windows バージョンの仮想環境を作成（win7 / win8 / win10 / win11）。              |
 | `install_wine_project.sh`   | プロジェクト名と Windows バージョンを選択し、Wine 仮想環境を構築。エイリアスも登録。   |
 | `install_metatrader.sh`     | MetaTrader 4 または 5 を Wine 上にインストールし、起動エイリアスを追加。             |
 | `install_adobe_cs.sh`       | Adobe CS4 / CS5 / CS6 のインストーラーを Wine で起動・環境構築（事前に入手が必要）。   |

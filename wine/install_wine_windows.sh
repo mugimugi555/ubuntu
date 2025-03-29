@@ -2,7 +2,7 @@
 set -e
 
 # === Wine 環境を作成するバージョン ===
-VERSIONS=("win7" "win8" "win10")
+VERSIONS=("win7" "win8" "win10" "win11")
 WINEARCH=win64
 COMMON_TRICKS="corefonts cjkfonts meiryo vcrun6 vcrun2010 vcrun2015 gdiplus dotnet40 msxml6 atmlib"
 

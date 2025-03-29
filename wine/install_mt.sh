@@ -80,10 +80,14 @@ TARGET_PATH="$WINEPREFIX/drive_c/Program Files/MetaTrader ${BASENAME:2}/terminal
 if ! grep -q "alias $CMD_NAME=" "$HOME/.bashrc"; then
     echo "alias $CMD_NAME='export WINEPREFIX=$WINEPREFIX && wine \"$TARGET_PATH\"'" >> "$HOME/.bashrc"
     echo "✅ .bashrc にエイリアス '$CMD_NAME' を追加しました。"
+    source "$HOME/.bashrc"
+    echo "✅ .bashrc を反映しました。エイリアス '$CMD_NAME' がすぐに使用できます。"
+else
+    echo "✅ すでにエイリアス '$CMD_NAME' は設定されています。"
 fi
 
 echo "✅ MetaTrader $BASENAME の Wine 環境セットアップ完了！"
 echo "📌 起動方法:"
 echo "export WINEPREFIX=$WINEPREFIX"
 echo "wine \"$TARGET_PATH\""
-echo "または 'source ~/.bashrc' 後に '$CMD_NAME' で起動できます。"
+echo "または一度 'source ~/.bashrc' 後に '$CMD_NAME' で起動できます。"

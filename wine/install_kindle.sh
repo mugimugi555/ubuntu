@@ -4,19 +4,18 @@ set -e
 # === 基本設定 ===
 APP_NAME="Kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
-INSTALLER_URL="https://www.amazon.co.jp/kindle-dbs/fd/kcp/download/KCPInstaller.exe"
+INSTALLER_URL="https://www.amazon.co.jp/kindlepcdownload/?_encoding=UTF8&ref_=cct_cg_kcapp_2c1&pf_rd_p=868427f2-7839-44a2-8dc3-70739ba6750a&pf_rd_r=RASK0T5D1REJ1HW4H77B"
 INSTALLER_FILE="$HOME/Downloads/KCPInstaller.exe"
 
-# === Ubuntu バージョン確認 ===
+# === Ubuntu バージョン確認 & WineHQ サポート確認 ===
 UBUNTU_CODENAME=$(lsb_release -cs)
-SUPPORTED_CODENAMES=("bionic" "focal" "jammy" "kinetic" "lunar" "mantic")
+WINEHQ_SOURCE_URL="https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
 
-if [[ ! " ${SUPPORTED_CODENAMES[*]} " =~ " ${UBUNTU_CODENAME} " ]]; then
-    echo "❌ 未対応の Ubuntu バージョンです: ${UBUNTU_CODENAME}"
+echo "🔍 Ubuntu バージョン: $UBUNTU_CODENAME"
+if ! wget --spider -q "$WINEHQ_SOURCE_URL"; then
+    echo "❌ WineHQ はこのバージョンの Ubuntu に未対応です: $UBUNTU_CODENAME"
     exit 1
 fi
-
-echo "🔹 Ubuntu $UBUNTU_CODENAME に対応した WineHQ をセットアップします..."
 
 # === WineHQ リポジトリ追加 ===
 sudo dpkg --add-architecture i386

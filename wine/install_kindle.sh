@@ -4,7 +4,7 @@ set -e
 # === 基本設定 ===
 APP_NAME="kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
-INSTALLER_PATH="$HOME/Downloads/KindleForPC-installer-1.40.65535.exe"
+INSTALLER_PATH="$HOME/KindleForPC-installer-1.40.65535.exe" # https://kindle-for-pc.jp.uptodown.com/windows/download/106935598
 
 # === インストーラーファイルの確認 ===
 if [ ! -f "$INSTALLER_PATH" ]; then

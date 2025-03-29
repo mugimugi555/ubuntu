@@ -58,9 +58,9 @@ export WINEPREFIX
 echo "🔹 Wine 環境を初期化中..."
 wineboot -i
 
-# === Windows バージョンを Windows 7 に設定 ===
-echo "🔧 Wine 環境を Windows 7 モードに設定..."
-winetricks -q settings win8
+# === Windows バージョンを Windows 10 に設定 ===
+echo "🔧 Wine 環境を Windows 10 モードに設定..."
+winetricks -q settings win10
 
 # === ランタイム & フォント ===
 echo "🔹 必要なランタイムとフォントをインストール中..."

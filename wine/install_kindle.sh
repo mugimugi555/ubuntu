@@ -60,11 +60,11 @@ wineboot -i
 
 # === Windows バージョンを Windows 7 に設定 ===
 echo "🔧 Wine 環境を Windows 7 モードに設定..."
-winetricks -q settings win7
+winetricks -q settings win8
 
 # === ランタイム & フォント ===
 echo "🔹 必要なランタイムとフォントをインストール中..."
-winetricks -q corefonts vcrun6 vcrun2010
+winetricks -q corefonts vcrun6 vcrun2010 dotnet40
 
 # === インストーラーの起動 ===
 echo "🔹 Kindle インストーラーを起動します..."

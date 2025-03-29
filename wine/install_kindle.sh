@@ -2,7 +2,7 @@
 set -e
 
 # === 基本設定 ===
-APP_NAME="Kindle"
+APP_NAME="kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
 INSTALLER_PATH="$HOME/Downloads/KindleForPC-installer-1.40.65535.exe"
 

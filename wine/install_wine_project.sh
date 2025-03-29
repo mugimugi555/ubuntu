@@ -3,6 +3,30 @@ set -e
 
 echo "🛠 Wine 仮想環境の作成スクリプト (64bit 固定)"
 
+# === WineHQ のインストール確認 & 自動導入 ===
+if ! command -v wine &>/dev/null || ! command -v winetricks &>/dev/null; then
+    echo "🔍 Wine または Winetricks が見つかりません。自動でインストールを行います..."
+
+    UBUNTU_CODENAME=$(lsb_release -cs)
+    WINEHQ_SOURCE_URL="https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
+
+    if ! wget --spider -q "$WINEHQ_SOURCE_URL"; then
+        echo "❌ この Ubuntu バージョン ($UBUNTU_CODENAME) は WineHQ に対応していません。"
+        exit 1
+    fi
+
+    sudo dpkg --add-architecture i386
+    sudo mkdir -pm755 /etc/apt/keyrings
+    sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+    sudo wget -NP /etc/apt/sources.list.d/ "$WINEHQ_SOURCE_URL"
+
+    sudo apt update
+    sudo apt install -y --install-recommends winehq-stable
+    sudo apt install -y wine64 wine32 winetricks wget cabextract \
+        fonts-ipafont fonts-noto-cjk fonts-takao-gothic unzip lsb-release
+    echo "✅ WineHQ と関連パッケージをインストールしました。"
+fi
+
 # === プロジェクト名の入力 ===
 read -p "📦 プロジェクト名を入力してください（例: photoshop, kindle）: " APP_NAME
 if [ -z "$APP_NAME" ]; then
@@ -65,11 +89,11 @@ else
 fi
 
 # === 完了メッセージ ===
-echo ""
+echo
 echo "✅ 仮想環境 '$APP_NAME' の作成が完了しました！"
 echo "📁 WINEPREFIX: $WINEPREFIX"
 echo "🧪 Windows: $WINVER / 64bit"
-echo ""
+echo
 echo "📌 起動方法:"
 echo "source ~/.bashrc"
 echo "$ALIAS_NAME"

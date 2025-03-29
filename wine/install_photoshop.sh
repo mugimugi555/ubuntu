@@ -1,16 +1,15 @@
 #!/bin/bash
+set -e
 
-# CS4/CS5/CS6 すべてに対応するインストールスクリプト
-
-# インストール用の環境変数
-CS_VERSION="CS5"  # CS4, CS5, CS6 を選択
+# === 設定 ===
+CS_VERSION="CS5"
 INSTALLER_PATH="$HOME/Downloads/Adobe $CS_VERSION/Set-up.exe"
 WINEPREFIX="$HOME/.wine-$CS_VERSION"
 
-# インストールファイルの存在チェック
+# === インストーラの存在確認 ===
 if [ ! -f "$INSTALLER_PATH" ]; then
-    echo "❌ Adobe $CS_VERSION のインストーラー ($INSTALLER_PATH) が見つかりません。"
-    echo "📌 手動でダウンロードし、$HOME/Downloads に保存してください。"
+    echo "❌ Adobe $CS_VERSION のインストーラーが見つかりません: $INSTALLER_PATH"
+    echo "📌 手動でダウンロードし、正しい場所に保存してください。"
     exit 1
 fi
 
@@ -25,23 +24,23 @@ fi
 
 echo "🔹 Ubuntu $UBUNTU_CODENAME に対応した WineHQ をセットアップします..."
 
-# === WineHQ リポジトリ設定 ===
+# === WineHQ リポジトリと鍵の追加 ===
 sudo dpkg --add-architecture i386
 sudo mkdir -pm755 /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
 sudo wget -NP /etc/apt/sources.list.d/ \
   "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
 
-# === パッケージのインストール ===
+# === Wine + フォント・ランタイムのインストール ===
 sudo apt update
 sudo apt install -y --install-recommends winehq-stable
 sudo apt install -y wine64 wine32 winetricks wget cabextract \
   fonts-ipafont fonts-noto-cjk fonts-takao-gothic
 
-# === 古い wineserver の停止 ===
+# === 古い Wine セッションを終了 ===
 wineserver -k || true
 
-# === 既存環境の削除確認 ===
+# === 既存プレフィックスの確認と削除 ===
 if [ -d "$WINEPREFIX" ]; then
     echo "⚠️ 既に Wine 環境が存在します: $WINEPREFIX"
     read -p "❓ 削除して再作成しますか？ (y/N): " yn
@@ -60,18 +59,16 @@ export WINEPREFIX
 echo "🔹 Wine 環境を初期化中..."
 wineboot -i
 
-# === 必要なランタイムとフォント ===
+# === Winetricks による必要ランタイム & フォントのインストール ===
 echo "🔹 ランタイムとフォントをインストール中..."
-winetricks -q corefonts cjkfonts allfonts vcrun6 vcrun2010 gdiplus
+winetricks --self-update -q
+winetricks -q cjkfonts corefonts fakejapanese meiryo
+winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
 
-# 必要なランタイムをインストール
-echo "📌 Adobe $CS_VERSION に必要なランタイムをインストール..."
-printf 'Y\n' | sudo WINEPREFIX=$WINEPREFIX winetricks --self-update
-WINEPREFIX=$WINEPREFIX winetricks cjkfonts corefonts fakejapanese meiryo
-WINEDEBUG=-all WINEPREFIX=$WINEPREFIX winetricks -q vcrun2005 vcrun2008 vcrun2010 atmlib gdiplus msxml6
+# === Adobe セットアップ起動 ===
+echo "🔹 Adobe $CS_VERSION のインストーラーを起動します..."
+wine "$INSTALLER_PATH"
 
-# Adobe のインストール
-echo "📌 Adobe $CS_VERSION のインストーラーを起動します..."
-WINEPREFIX=$WINEPREFIX wine "$INSTALLER_PATH"
-
-echo "✅ Adobe $CS_VERSION のセットアップが完了しました！"
+# === 完了メッセージ ===
+echo "✅ Adobe $CS_VERSION の Wine セットアップが完了しました！"
+echo "📂 インストール先: $WINEPREFIX"

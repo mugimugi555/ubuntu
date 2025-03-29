@@ -4,15 +4,23 @@ set -e
 # === 基本設定 ===
 APP_NAME="Kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
-INSTALLER_URL="https://www.amazon.co.jp/kindlepcdownload/?_encoding=UTF8&ref_=cct_cg_kcapp_2c1&pf_rd_p=868427f2-7839-44a2-8dc3-70739ba6750a&pf_rd_r=RASK0T5D1REJ1HW4H77B"
+INSTALLER_PATH="$HOME/Downloads/KCPInstaller.exe"
 
-# === Ubuntu バージョン確認 & WineHQ サポート確認 ===
+# === インストーラーファイルの確認 ===
+if [ ! -f "$INSTALLER_PATH" ]; then
+    echo "❌ Kindle インストーラーが見つかりません: $INSTALLER_PATH"
+    echo "📌 手動でダウンロードしてこの場所に保存してください。"
+    echo "例: https://www.amazon.co.jp/kindle-dbs/fd/kcp/download/KCPInstaller.exe"
+    exit 1
+fi
+
+# === Ubuntu バージョン & WineHQ サポート確認 ===
 UBUNTU_CODENAME=$(lsb_release -cs)
 WINEHQ_SOURCE_URL="https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
 
 echo "🔍 Ubuntu バージョン: $UBUNTU_CODENAME"
 if ! wget --spider -q "$WINEHQ_SOURCE_URL"; then
-    echo "❌ WineHQ はこのバージョンの Ubuntu に未対応です: $UBUNTU_CODENAME"
+    echo "❌ WineHQ はこのバージョンの Ubuntu に未対応です: ${UBUNTU_CODENAME}"
     exit 1
 fi
 
@@ -21,7 +29,7 @@ sudo dpkg --add-architecture i386
 sudo mkdir -pm755 /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
 sudo wget -NP /etc/apt/sources.list.d/ \
-  "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
+  "$WINEHQ_SOURCE_URL"
 
 # === パッケージのインストール ===
 sudo apt update
@@ -55,12 +63,9 @@ wineboot -i
 echo "🔹 必要なランタイムとフォントをインストール中..."
 winetricks -q corefonts vcrun6 vcrun2010
 
-# === Kindle インストーラーの取得と実行 ===
-echo "🔹 Kindle インストーラーをダウンロード..."
-wget -O kindle_installer.exe "$INSTALLER_URL"
-
-echo "🔹 インストーラーを起動します..."
-wine kindle_installer.exe
+# === インストーラーの起動 ===
+echo "🔹 Kindle インストーラーを起動します..."
+wine "$INSTALLER_PATH"
 
 # === .bashrc にエイリアスを追加 ===
 CMD_NAME="kindle"
@@ -74,7 +79,7 @@ else
     echo "✅ すでにエイリアス '$CMD_NAME' は設定済みです。"
 fi
 
-echo "✅ Kindle for PC のセットアップ完了！"
+echo "✅ Kindle for PC の Wine 環境セットアップ完了！"
 echo "📌 起動方法:"
 echo "export WINEPREFIX=$WINEPREFIX"
 echo "wine \"$TARGET_PATH\""

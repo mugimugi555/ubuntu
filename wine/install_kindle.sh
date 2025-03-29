@@ -28,8 +28,7 @@ fi
 sudo dpkg --add-architecture i386
 sudo mkdir -pm755 /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-sudo wget -NP /etc/apt/sources.list.d/ \
-  "$WINEHQ_SOURCE_URL"
+sudo wget -NP /etc/apt/sources.list.d/ "$WINEHQ_SOURCE_URL"
 
 # === パッケージのインストール ===
 sudo apt update
@@ -59,6 +58,10 @@ export WINEPREFIX
 echo "🔹 Wine 環境を初期化中..."
 wineboot -i
 
+# === Windows バージョンを Windows 7 に設定 ===
+echo "🔧 Wine 環境を Windows 7 モードに設定..."
+winetricks -q settings win7
+
 # === ランタイム & フォント ===
 echo "🔹 必要なランタイムとフォントをインストール中..."
 winetricks -q corefonts vcrun6 vcrun2010
@@ -79,7 +82,7 @@ else
     echo "✅ すでにエイリアス '$CMD_NAME' は設定済みです。"
 fi
 
-echo "✅ Kindle for PC の Wine 環境セットアップ完了！"
+echo "✅ Kindle for PC の Wine 環境セットアップ完了（Windows 7 モード）！"
 echo "📌 起動方法:"
 echo "export WINEPREFIX=$WINEPREFIX"
 echo "wine \"$TARGET_PATH\""

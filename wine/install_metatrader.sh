@@ -18,20 +18,23 @@ fi
 WINEPREFIX="$HOME/.wine-$MT_VERSION"
 INSTALLER_PATH="$HOME/Downloads/${MT_VERSION}setup.exe"
 
-# === Ubuntu バージョン確認 ===
+# === Ubuntu バージョンと WineHQ リポジトリの存在チェック ===
 UBUNTU_CODENAME=$(lsb_release -cs)
-SUPPORTED_CODENAMES=("bionic" "focal" "jammy" "kinetic" "lunar" "mantic")
-if [[ ! " ${SUPPORTED_CODENAMES[*]} " =~ " ${UBUNTU_CODENAME} " ]]; then
-    echo "❌ 未対応の Ubuntu バージョンです: ${UBUNTU_CODENAME}"
+WINEHQ_SOURCE_URL="https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
+
+echo "🔎 WineHQ リポジトリの存在確認中: $WINEHQ_SOURCE_URL ..."
+if ! wget --spider -q "$WINEHQ_SOURCE_URL"; then
+    echo "❌ WineHQ は Ubuntu $UBUNTU_CODENAME をまだサポートしていません。"
+    echo "🔗 https://dl.winehq.org/wine-builds/ubuntu/dists/ をご確認ください。"
     exit 1
 fi
+echo "✅ 対応済み: Ubuntu $UBUNTU_CODENAME"
 
 # === WineHQ リポジトリ追加 ===
 sudo dpkg --add-architecture i386
 sudo mkdir -pm755 /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-sudo wget -NP /etc/apt/sources.list.d/ \
-  "https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources"
+sudo wget -NP /etc/apt/sources.list.d/ "$WINEHQ_SOURCE_URL"
 
 # === パッケージインストール ===
 sudo apt update
@@ -80,12 +83,12 @@ TARGET_PATH="$WINEPREFIX/drive_c/Program Files/MetaTrader ${BASENAME:2}/terminal
 if ! grep -q "alias $CMD_NAME=" "$HOME/.bashrc"; then
     echo "alias $CMD_NAME='export WINEPREFIX=$WINEPREFIX && wine \"$TARGET_PATH\"'" >> "$HOME/.bashrc"
     echo "✅ .bashrc にエイリアス '$CMD_NAME' を追加しました。"
-    source "$HOME/.bashrc"
-    echo "✅ .bashrc を反映しました。エイリアス '$CMD_NAME' がすぐに使用できます。"
+    echo "⚠️ 新しいターミナルで '$CMD_NAME' を使えるようになります。"
 else
     echo "✅ すでにエイリアス '$CMD_NAME' は設定されています。"
 fi
 
+# === 完了案内 ===
 echo "✅ MetaTrader $BASENAME の Wine 環境セットアップ完了！"
 echo "📌 起動方法:"
 echo "export WINEPREFIX=$WINEPREFIX"

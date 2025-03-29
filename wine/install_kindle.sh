@@ -5,7 +5,6 @@ set -e
 APP_NAME="Kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
 INSTALLER_URL="https://www.amazon.co.jp/kindlepcdownload/?_encoding=UTF8&ref_=cct_cg_kcapp_2c1&pf_rd_p=868427f2-7839-44a2-8dc3-70739ba6750a&pf_rd_r=RASK0T5D1REJ1HW4H77B"
-INSTALLER_FILE="$HOME/Downloads/KCPInstaller.exe"
 
 # === Ubuntu バージョン確認 & WineHQ サポート確認 ===
 UBUNTU_CODENAME=$(lsb_release -cs)
@@ -58,10 +57,10 @@ winetricks -q corefonts vcrun6 vcrun2010
 
 # === Kindle インストーラーの取得と実行 ===
 echo "🔹 Kindle インストーラーをダウンロード..."
-wget -O "$INSTALLER_FILE" "$INSTALLER_URL"
+wget -O kindle_installer.exe "$INSTALLER_URL"
 
 echo "🔹 インストーラーを起動します..."
-wine "$INSTALLER_FILE"
+wine kindle_installer.exe
 
 # === .bashrc にエイリアスを追加 ===
 CMD_NAME="kindle"

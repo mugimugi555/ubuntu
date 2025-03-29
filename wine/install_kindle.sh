@@ -4,7 +4,7 @@ set -e
 # === 基本設定 ===
 APP_NAME="Kindle"
 WINEPREFIX="$HOME/.wine-$APP_NAME"
-INSTALLER_PATH="$HOME/Downloads/KCPInstaller.exe"
+INSTALLER_PATH="$HOME/Downloads/kindle-2-6-70964.exe"
 
 # === インストーラーファイルの確認 ===
 if [ ! -f "$INSTALLER_PATH" ]; then

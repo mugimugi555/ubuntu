@@ -16,7 +16,7 @@ else
 fi
 
 # === ブローカー名の入力 ===
-read -p "証券会社名を英数字で入力してください（例: bigboss）: " BROKER
+read -p "証券会社名を英数字で入力してください（例: rakutenfx）: " BROKER
 WINEPREFIX="$HOME/.wine-${MT_VERSION}-${BROKER}"
 INSTALLER_PATH="$HOME/Downloads/${MT_VERSION}setup-${BROKER}.exe"
 

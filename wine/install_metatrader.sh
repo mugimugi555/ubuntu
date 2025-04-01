@@ -9,7 +9,7 @@ read -p "番号を入力 [1-2]（デフォルト: 2）: " VERSION
 
 if [[ "$VERSION" == "1" ]]; then
     MT_VERSION="mt4"
-    MT_URL="https://download.mql5.com/cdn/web/metaquotes.software.corp/mt4/mt4setup.exe"
+    MT_URL="https://download.mql5.com/cdn/web/metaquotes.software.corp/mt4/mt4oldsetup.exe"
 else
     MT_VERSION="mt5"
     MT_URL="https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe"

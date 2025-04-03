@@ -44,22 +44,18 @@ sudo apt update && sudo apt upgrade -y
 
 # システムユーティリティ
 echo "🔹 システムユーティリティをインストールします。"
-sudo apt install -y emacs-nox htop git axel samba openssh-server net-tools exfat-fuse
+sudo apt install -y unzip curl emacs-nox htop git axel samba openssh-server net-tools exfat-fuse
 
 # メディア関連ツール
 echo "🔹 メディア関連ツールをインストールします。"
 sudo apt install -y ffmpeg imagemagick lame vlc unar
-
-# 日本語入力/ロケール/フォント
-echo "🔹 日本語環境をインストールします。"
-sudo apt install -y ibus-mozc unzip manpages-ja manpages-ja-dev gnome-tweaks ubuntu-restricted-extras
 
 # Python / yt-dlp
 echo "🔹 yt-dlp を pip 経由でインストールします。"
 sudo apt install -y python3-pip
 pip3 install --upgrade yt-dlp
 
-# Snapアプリ（必要であれば）
+# Snapアプリ
 echo "🔹 Snap アプリをインストールします。"
 sudo snap install kdiskmark && sudo snap connect kdiskmark:removable-media
 sudo snap install losslesscut && sudo snap connect losslesscut:removable-media
@@ -67,7 +63,6 @@ sudo snap install --classic code
 sudo snap install --classic gimp
 
 # ======================= ブラウザと Snap 削除 =======================
-
 echo "🔹 Snap版 Firefox を削除します。"
 sudo snap remove firefox || true
 
@@ -80,6 +75,9 @@ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -
 sudo apt install -y ./chrome.deb
 
 # ======================= ロケール・日本語設定 =======================
+echo "🔹 日本語環境をインストールします。"
+sudo apt install -y ibus-mozc manpages-ja manpages-ja-dev gnome-tweaks ubuntu-restricted-extras
+
 echo "🔹 ロケールと言語設定を適用します。"
 sudo update-locale LANG=ja_JP.UTF8
 sudo ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
@@ -98,11 +96,6 @@ gsettings set org.gnome.shell.favorite-apps "['brave-browser.desktop', 'google-c
 # HDDスリープ設定
 echo "🔹 HDD スリープ設定します。"
 sudo hdparm -S 242 /dev/sd*
-
-# youtube-dl 最新取得
-echo "🔹 youtube-dl を取得します。"
-sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
-sudo chmod a+rx /usr/local/bin/youtube-dl
 
 # ======================= 日本語入力 Mozc 設定 =======================
 echo "🔹 日本語入力 Mozc の設定します。"

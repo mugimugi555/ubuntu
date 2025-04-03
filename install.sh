@@ -39,6 +39,39 @@ gsettings set org.gnome.desktop.background picture-uri "file:///home/$USER/Pictu
 #-----------------------------------------------------------------------------------------------------------------------
 #sudo echo "Acquire::http::Proxy \"http://192.168.0.5:3142\";" | sudo tee -a /etc/apt/apt.conf.d/02proxy ;
 
+# === Firefox Snap 削除 ===
+echo "🔹 Snap版 Firefox を削除中..."
+sudo snap remove firefox || true
+
+# === Braveのdeb版インストール ===
+echo "🔹 Braveブラウザをインストール中..."
+sudo apt install -y curl
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg \
+  https://brave.com/signing-key.asc
+
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] \
+  https://brave-browser-apt-release.s3.brave.com/ stable main" \
+  | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+sudo apt update
+sudo apt install -y brave-browser
+
+# === フォントのインストール時のEULA確認ウィザードを回避 ===
+echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" \
+  | sudo debconf-set-selections
+
+# === Postfix のインストールウィザードを回避 ===
+echo "postfix postfix/mailname string localhost" | sudo debconf-set-selections
+
+echo "postfix postfix/main_mailer_type string 'No configuration'" | sudo debconf-set-selections
+
+# === Wine関係の設定やGNOMEのカスタム設定などは、既存スクリプトと統合してください ===
+
+# === 最後に確認 ===
+echo "✅ Firefox Snap 削除 & Brave インストール 完了"
+echo "✅ ms-fonts と postfix のウィザード回避済み"
+echo "📝 必要に応じてスクリプトの続きに統合してください。"
+
 #-----------------------------------------------------------------------------------------------------------------------
 # software
 #-----------------------------------------------------------------------------------------------------------------------

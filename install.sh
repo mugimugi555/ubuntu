@@ -94,7 +94,7 @@ sudo sed -i 's/#NTP=/NTP=ntp.nict.jp/g' /etc/systemd/timesyncd.conf
 
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans CJK JP 11'
 gsettings set org.gnome.mutter auto-maximize false
-gsettings set org.gnome.shell.favorite-apps "['brave-browser.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gedit.desktop', 'gnome-control-center.desktop']"
+gsettings set org.gnome.shell favorite-apps "['brave-browser.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gedit.desktop', 'gnome-control-center.desktop']"
 
 # HDDスリープ設定
 echo "🔹 HDD スリープ設定します。"

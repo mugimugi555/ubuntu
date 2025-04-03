@@ -53,17 +53,13 @@ sudo apt install -y emacs-nox gedit
 echo "🔹 メディア関連ツールをインストールします。"
 sudo apt install -y ffmpeg imagemagick lame vlc unar
 
-# Python / yt-dlp
-echo "🔹 yt-dlp を pip 経由でインストールします。"
-sudo apt install -y python3-pip
-pip3 install --upgrade yt-dlp
-
 # Snapアプリ
 echo "🔹 Snap アプリをインストールします。"
 sudo snap install kdiskmark && sudo snap connect kdiskmark:removable-media
 sudo snap install losslesscut && sudo snap connect losslesscut:removable-media
 sudo snap install --classic code
 sudo snap install --classic gimp
+sudo snap install --edge yt-dlp
 
 # ======================= ブラウザと Snap 削除 =======================
 echo "🔹 Snap版 Firefox を削除します。"

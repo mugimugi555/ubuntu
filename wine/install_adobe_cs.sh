@@ -83,3 +83,26 @@ wine "$INSTALLER_PATH"
 # === 完了 ===
 echo "✅ Adobe $CS_VERSION の Wine セットアップが完了しました！"
 echo "📂 Wine 環境: $WINEPREFIX"
+
+# === 起動案内 ===
+echo ""
+echo "✅ Adobe $CS_VERSION の Wine セットアップが完了しました！"
+echo "📂 Wine 環境: $WINEPREFIX"
+echo ""
+echo "📌 次のコマンドで Photoshop を起動できます:"
+echo ""
+echo "export WINEPREFIX=\"$WINEPREFIX\""
+echo "wine \"\$WINEPREFIX/drive_c/Program Files/Adobe/Adobe Photoshop $CS_VERSION (64 Bit)/Photoshop.exe\""
+echo ""
+echo "📝 または、以下のエイリアスで簡単に起動できます:"
+
+# === エイリアス追加 ===
+ALIAS_NAME="photoshop$CS_VERSION"
+CMD_PATH="$WINEPREFIX/drive_c/Program Files/Adobe/Adobe Photoshop $CS_VERSION (64 Bit)/Photoshop.exe"
+if ! grep -q "alias $ALIAS_NAME=" "$HOME/.bashrc"; then
+  echo "alias $ALIAS_NAME='export WINEPREFIX=$WINEPREFIX && wine \"$CMD_PATH\"'" >> "$HOME/.bashrc"
+  echo "✅ .bashrc にエイリアス '$ALIAS_NAME' を追加しました。"
+  echo "➡️ ターミナルで '$ALIAS_NAME' と打てば Photoshop を起動できます。"
+else
+  echo "ℹ️ エイリアス '$ALIAS_NAME' はすでに存在しています。"
+fi

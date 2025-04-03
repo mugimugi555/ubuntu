@@ -2,13 +2,6 @@
 set -e
 
 # wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install.sh && bash install.sh ;
-#
-# or save and edit file
-#
-# wget https://raw.githubusercontent.com/mugimugi555/ubuntu/main/install.sh && gedit install.sh ;
-# bash install.sh ;
-#!/bin/bash
-set -e
 
 # ======================= 基本設定と初期化 =======================
 

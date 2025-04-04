@@ -3,6 +3,20 @@ set -e
 
 echo "🛠 No-IP Dynamic DNS クライアント (DUC) のセットアップを開始します..."
 
+# === アカウント情報の入力または誘導 ===
+read -p "🔑 No-IP アカウントをお持ちですか？ (y/N): " has_account
+if [[ ! "$has_account" =~ ^[Yy]$ ]]; then
+    echo "🌐 No-IP アカウント作成ページを開こうとしています..."
+
+    if ! xdg-open "https://www.noip.com/sign-up" >/dev/null 2>&1; then
+        echo "⚠️ GUI 環境がないためブラウザを開けませんでした。以下の URL をブラウザで開いてアカウントを作成してください:"
+        echo "🔗 https://www.noip.com/sign-up"
+    fi
+
+    echo "✅ アカウント作成後、再度このスクリプトを実行してください。"
+    exit 1
+fi
+
 # === 依存関係のインストール ===
 echo "🔹 ビルドに必要なパッケージをインストールします..."
 sudo apt update
@@ -25,23 +39,9 @@ echo "🔧 make を実行中..."
 make
 sudo make install
 
-# === アカウント情報の入力または誘導 ===
-read -p "🔑 No-IP アカウントをお持ちですか？ (y/N): " has_account
-if [[ ! "$has_account" =~ ^[Yy]$ ]]; then
-    echo "🌐 No-IP アカウント作成ページを開こうとしています..."
-
-    if ! xdg-open "https://www.noip.com/sign-up" >/dev/null 2>&1; then
-        echo "⚠️ GUI 環境がないためブラウザを開けませんでした。以下の URL をブラウザで開いてアカウントを作成してください:"
-        echo "🔗 https://www.noip.com/sign-up"
-    fi
-
-    echo "✅ アカウント作成後、再度このスクリプトを実行してください。"
-    exit 1
-fi
-
 # === アカウント情報を手動入力して設定 ===
-echo "🧾 No-IP クライアント初期設定 (アカウント情報などを入力してください)..."
-sudo /usr/local/bin/noip2 -C
+#echo "🧾 No-IP クライアント初期設定 (アカウント情報などを入力してください)..."
+#sudo /usr/local/bin/noip2 -C
 
 # === 自動起動スクリプトの作成 ===
 echo "📝 systemd サービスを作成しています..."

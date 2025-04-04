@@ -37,6 +37,7 @@ cd noip-*
 # === make & インストール ===
 echo "🔧 make を実行中..."
 make
+echo "🧾 No-IP クライアント初期設定 (アカウント情報などを入力してください)..."
 sudo make install
 
 # === アカウント情報を手動入力して設定 ===

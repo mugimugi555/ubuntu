@@ -70,6 +70,22 @@ MIRRORS=(
 )
 EOF
 
+# .bashrc に `alias up=` が存在する場合は置き換え、なければ追記
+UP_ALIAS="alias up='sudo apt-fast update && sudo apt-fast upgrade -y && sudo apt-fast autoremove -y ; sudo snap refresh'"
+BASHRC="$HOME/.bashrc"
+
+if grep -q "alias up=" "$BASHRC"; then
+    echo "🔄 既存の alias up を置き換えます..."
+    sed -i '/alias up=/c\'"$UP_ALIAS" "$BASHRC"
+else
+    echo "➕ alias up を .bashrc に追加します..."
+    echo "$UP_ALIAS" >> "$BASHRC"
+fi
+
+# 反映
+source "$BASHRC"
+echo "✅ alias up が apt-fast を使うようになりました！"
+
 # `.bashrc` にエイリアスを追加（重複を防ぐ）
 BASHRC_FILE="$HOME/.bashrc"
 ALIAS_CMD="alias apt='function _apt() { case \"\$1\" in install|update|upgrade|dist-upgrade|full-upgrade) apt-fast \"\$@\";; *) command apt \"\$@\";; esac; }; _apt'"

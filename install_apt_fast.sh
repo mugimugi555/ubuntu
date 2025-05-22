@@ -40,8 +40,10 @@ else
     echo "🔹 GitHub からソースインストールを実行します..."
 
     # `apt-fast` を GitHub からダウンロード & インストール
+    # shellcheck disable=SC2164
     cd /usr/local/src
     sudo git clone https://github.com/ilikenwf/apt-fast.git
+    # shellcheck disable=SC2164
     cd apt-fast
 
     # `apt-fast` をシステムにインストール
@@ -83,6 +85,7 @@ else
 fi
 
 # 反映
+# shellcheck disable=SC1090
 source "$BASHRC"
 echo "✅ alias up が apt-fast を使うようになりました！"
 
@@ -99,6 +102,7 @@ fi
 
 # エイリアスを即時適用
 echo "🔄 エイリアスを適用中..."
+# shellcheck disable=SC1090
 source "$BASHRC_FILE"
 
 echo "✅ apt-fast のインストール & apt の並列化が完了しました！"

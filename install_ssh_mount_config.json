@@ -1,0 +1,14 @@
+{
+  "host": "remote.example.com",
+  "user": "yourusername",
+  "mounts": [
+    {
+      "remote": "/home/yourusername/data",
+      "local": "/mnt/remote/data"
+    },
+    {
+      "remote": "/var/log",
+      "local": "/mnt/remote/logs"
+    }
+  ]
+}

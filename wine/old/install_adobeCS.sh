@@ -5,7 +5,7 @@
 # インストール用の環境変数
 CS_VERSION="CS5"  # CS4, CS5, CS6 を選択
 INSTALLER_PATH="$HOME/Downloads/Adobe $CS_VERSION/Set-up.exe"
-WINEPREFIX="$HOME/.wine$CS_VERSION"
+WINEPREFIX="$HOME/.wine-$CS_VERSION"
 WINEARCH="win64"  # 32bit 環境なら "win32"
 SERIAL_NUMBER="1234-5678-9012-3456-7890-1234"  # シリアル番号を指定
 

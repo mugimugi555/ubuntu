@@ -1,3 +1,5 @@
+![タイトル画像](readme/header.png)
+
 # 📘 README: USB温湿度センサ（Strawberry Linux製 52002）セットアップガイド
 
 本プロジェクトでは、Strawberry Linux 製の USB温湿度センサ（商品コード: **52002**）を使用し、Ubuntu上で `usbrh` プログラムをビルド・インストール・使用する手順をまとめています。
@@ -154,3 +156,4 @@ read -p "デバイスを接続済みなら Enter を押してください（./us
 | ドライバ  | 不要（Linuxで libusb 使用）  |
 
 ---
+![タイトル画像](readme/header.png)

@@ -1,6 +1,6 @@
 # GitHubレポジトリ一括取得ツールの使い方
 
-![タイトル画像](assets/images/header.png)
+![タイトル画像](readme/header.png)
 
 ## 概要
 このスクリプトは、指定した GitHub ユーザーのリポジトリ一覧を取得し、
@@ -56,4 +56,4 @@ bash download_repos.sh GitHubユーザー名
 ## ライセンス
 このスクリプトは MIT ライセンスの下で提供されます。
 
-![タイトル画像](assets/images/footer.png)
+![タイトル画像](readme/footer.png)

@@ -1,6 +1,6 @@
 # Intel Xeon Phi (Knights Corner) 向け Ubuntu 環境構築ガイド
 
-![タイトル画像](assets/images/header.png)
+![タイトル画像](readme/header.png)
 
 このリポジトリでは、Intel Xeon Phi（Knights Corner）向けの **Ubuntu 環境構築手順** を提供します。Python のインストール、OpenCV のビルド、YOLO（You Only Look Once）を使用した物体検出、ImageMagick の活用方法について解説しています。
 
@@ -80,4 +80,4 @@ ssh mic0 "echo 'Xeon Phi に正常に接続できます。'"
 
 Python スクリプトは `for_upload/` ディレクトリに格納し、シェルスクリプトから呼び出すことで、再利用しやすくなります。
 
-![タイトル画像](assets/images/footer.png)
+![タイトル画像](readme/footer.png)

@@ -44,14 +44,14 @@ sudo apt update && sudo apt upgrade -y
 
 # システムユーティリティ
 echo "🔹 システムユーティリティをインストールします。"
-sudo apt install -y unzip curl htop git axel samba openssh-server net-tools exfat-fuse
+sudo apt install -y unzip curl htop git axel samba openssh-server net-tools exfat-fuse unar
 
 echo "🔹 エディタをインストールします。"
 sudo apt install -y emacs-nox gedit
 
 # メディア関連ツール
 echo "🔹 メディア関連ツールをインストールします。"
-sudo apt install -y ffmpeg imagemagick lame vlc unar
+sudo apt install -y ffmpeg imagemagick lame vlc
 
 # Snapアプリ
 echo "🔹 Snap アプリをインストールします。"

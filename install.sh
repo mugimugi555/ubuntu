@@ -93,8 +93,8 @@ gsettings set org.gnome.mutter auto-maximize false
 gsettings set org.gnome.shell favorite-apps "['brave-browser.desktop', 'google-chrome.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'gedit.desktop', 'gnome-control-center.desktop']"
 
 # HDDスリープ設定
-echo "🔹 HDD スリープ設定します。"
-sudo hdparm -S 242 /dev/sd*
+#echo "🔹 HDD スリープ設定します。"
+#sudo hdparm -S 242 /dev/sd*
 
 # ======================= 日本語入力 Mozc 設定 =======================
 echo "🔹 日本語入力 Mozc の設定します。"

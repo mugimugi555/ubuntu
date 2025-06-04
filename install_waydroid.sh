@@ -42,12 +42,21 @@ sudo systemctl start waydroid-container
 
 # 7. 起動コマンド（Wayland / X11 判定）
 if [ "$ENV_TYPE" = "wayland" ]; then
+
   echo "🚀 Wayland 用 Waydroid を起動します..."
   ALIAS_CMD="alias waydroid_start='waydroid show-full-ui'"
+  
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
+  
+  echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
+  echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
+  
+  # 起動（初回のみ）
   waydroid show-full-ui
+  
 else
+
   echo "🚀 X11 用 Weston 経由で Waydroid を起動します..."
   sudo apt install -y weston x11-xserver-utils
 

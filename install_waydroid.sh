@@ -40,16 +40,19 @@ echo "🔃 Waydroid コンテナサービスを有効化・起動します..."
 sudo systemctl enable waydroid-container
 sudo systemctl start waydroid-container
 
+# 6.5. 既存セッションの停止
+echo "🛑 既存の Waydroid セッションを停止中..."
+waydroid session stop || true
+
 # 7. 起動コマンド（Wayland / X11 判定）
 if [ "$ENV_TYPE" = "wayland" ]; then
 
   echo "🚀 Wayland 用 Waydroid を起動します..."
-  ALIAS_CMD="alias waydroid_start='waydroid show-full-ui'"
+  ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui'"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
-  # 起動（初回のみ）
   waydroid show-full-ui &
 
   echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
@@ -67,7 +70,7 @@ else
     sleep 1
   fi
 
-  # 解像度取得（現在の物理ディスプレイ）
+  # 解像度取得
   SCREEN_RES=$(xrandr | grep '*' | awk '{print $1}' | head -n1)
   SCREEN_WIDTH=$(echo $SCREEN_RES | cut -d'x' -f1)
   SCREEN_HEIGHT=$(echo $SCREEN_RES | cut -d'x' -f2)
@@ -84,7 +87,7 @@ else
 
   # 起動エイリアスを ~/.bashrc に追加
   echo "🔗 Weston + Waydroid 起動用 alias を ~/.bashrc に登録します..."
-  ALIAS_CMD="alias waydroid_start='pgrep -f \"weston --backend=x11-backend.so\" > /dev/null && echo 🚫 既に起動中です || dbus-run-session -- bash -c \"weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} & sleep 3; export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*')); echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY; waydroid show-full-ui\"'"
+  ALIAS_CMD="alias waydroid_start='pgrep -f \"weston --backend=x11-backend.so\" > /dev/null && echo 🚫 既に起動中です || (waydroid session stop || true && dbus-run-session -- bash -c \"weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} & sleep 3; export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*')); echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY; waydroid show-full-ui\")'"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc

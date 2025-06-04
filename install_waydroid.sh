@@ -87,7 +87,17 @@ else
 
   # 起動エイリアスを ~/.bashrc に追加
   echo "🔗 Weston + Waydroid 起動用 alias を ~/.bashrc に登録します..."
-  ALIAS_CMD="alias waydroid_start='pgrep -f \"weston --backend=x11-backend.so\" > /dev/null && echo 🚫 既に起動中です || (waydroid session stop || true && dbus-run-session -- bash -c \"weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} & sleep 3; export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*')); echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY; waydroid show-full-ui\")'"
+  ALIAS_CMD="alias waydroid_start='
+    pkill -f \"weston --backend=x11-backend.so\" 2>/dev/null || true;
+    waydroid session stop || true;
+    dbus-run-session -- bash -c \"
+      weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} &
+      sleep 3;
+      export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*'));
+      echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY;
+      waydroid show-full-ui
+    \"
+  '"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc

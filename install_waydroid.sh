@@ -49,12 +49,12 @@ if [ "$ENV_TYPE" = "wayland" ]; then
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
   
+  # 起動（初回のみ）
+  waydroid show-full-ui &
+
   echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
   echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
-  
-  # 起動（初回のみ）
-  waydroid show-full-ui
-  
+    
 else
 
   echo "🚀 X11 用 Weston 経由で Waydroid を起動します..."
@@ -82,9 +82,6 @@ else
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
-  echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
-  echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
-
   # 起動（初回のみ）
   dbus-run-session -- bash -c "
     weston --backend=x11-backend.so --width=$WESTON_W --height=$WESTON_H &
@@ -92,5 +89,9 @@ else
     export WAYLAND_DISPLAY=\$(basename \$(find \$XDG_RUNTIME_DIR -name 'wayland-*'))
     echo '✅ WAYLAND_DISPLAY='\$WAYLAND_DISPLAY
     waydroid show-full-ui
-  "
+  " &
+
+  echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
+  echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
+
 fi

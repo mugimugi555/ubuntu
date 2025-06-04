@@ -1,29 +1,39 @@
 #!/bin/bash
 set -e
 
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔰 Waydroid 自動インストールスクリプト (Wayland / X11 判別対応)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # 1. ディスプレイサーバーの種類を判定
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🔍 セッションタイプの確認中..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
   ENV_TYPE="wayland"
 else
   ENV_TYPE="x11"
 fi
-
-echo "🖥️ 検出されたセッションタイプ: $ENV_TYPE"
+echo "🖥️  検出されたセッションタイプ: $ENV_TYPE"
 
 # 2. Waydroid リポジトリ追加
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔸 Waydroid リポジトリを追加します..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo apt update
 sudo apt install -y curl ca-certificates gnupg lsb-release wget
 curl -s https://repo.waydro.id | sudo bash
 
 # 3. Waydroid 本体のインストール
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📦 Waydroid をインストールします..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo apt install -y waydroid
 
-# 4. カーネルモジュールの確認と警告
+# 4. カーネルモジュールの確認
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔎 binder/ashmem モジュールの確認..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if ! lsmod | grep -q binder_linux; then
   echo "⚠️ binder_linux が読み込まれていません。"
 fi
@@ -31,46 +41,50 @@ if ! lsmod | grep -q ashmem_linux; then
   echo "⚠️ ashmem_linux が読み込まれていません。"
 fi
 
-# 5. Waydroid 初期化（GAPPSあり）
-echo "🔧 Waydroid の初期化を行います..."
+# 5. 初期化
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🔧 Waydroid の初期化（GAPPS）..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo waydroid init -s GAPPS -f
 
 # 6. サービス起動
-echo "🔃 Waydroid コンテナサービスを有効化・起動します..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🔃 Waydroid コンテナサービスを起動中..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo systemctl enable waydroid-container
 sudo systemctl start waydroid-container
 
-# 6.5. 既存セッションの停止
+# 6.5 セッション停止
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🛑 既存の Waydroid セッションを停止中..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 waydroid session stop || true
 
-# 7. 起動コマンド（Wayland / X11 判定）
+# 7. 起動設定と初回起動
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🚀 Waydroid 起動設定（$ENV_TYPE）..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
 if [ "$ENV_TYPE" = "wayland" ]; then
 
-  echo "🚀 Wayland 用 Waydroid を起動します..."
+  echo "🔗 Wayland 用 alias を登録中..."
   ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui --windowed'"
-
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
+  echo "🟢 Waydroid 起動（ウィンドウモード）..."
   waydroid show-full-ui --windowed &
 
-  echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
-  echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
-
 else
-
-  echo "🚀 X11 用 Weston 経由で Waydroid を起動します..."
+  echo "🔗 X11 用 weston 経由の Waydroid 起動を準備中..."
   sudo apt install -y weston x11-xserver-utils
 
-  # 既存の weston を終了（重複起動防止）
   if pgrep -f "weston --backend=x11-backend.so" > /dev/null; then
-    echo "🛑 既存の Weston セッションを終了します..."
+    echo "🛑 既存の Weston を終了します..."
     pkill -f "weston --backend=x11-backend.so"
     sleep 1
   fi
 
-  # 解像度取得
   SCREEN_RES=$(xrandr | grep '*' | awk '{print $1}' | head -n1)
   SCREEN_WIDTH=$(echo $SCREEN_RES | cut -d'x' -f1)
   SCREEN_HEIGHT=$(echo $SCREEN_RES | cut -d'x' -f2)
@@ -83,10 +97,9 @@ else
     WESTON_H=$SCREEN_HEIGHT
   fi
 
-  echo "📐 使用する Weston 解像度: ${WESTON_W}x${WESTON_H}"
+  echo "📐 Weston 解像度: ${WESTON_W}x${WESTON_H}"
 
-  # 起動エイリアスを ~/.bashrc に追加
-  echo "🔗 Weston + Waydroid 起動用 alias を ~/.bashrc に登録します..."
+  echo "🔗 alias を登録中..."
   ALIAS_CMD="alias waydroid_start='
     pkill -f \"weston --backend=x11-backend.so\" 2>/dev/null || true;
     waydroid session stop || true;
@@ -95,23 +108,24 @@ else
       sleep 3;
       export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*'));
       echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY;
-      waydroid show-full-ui
+      waydroid show-full-ui --windowed
     \"
   '"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
-  # 起動（初回のみ）
+  echo "🟢 初回起動中..."
   dbus-run-session -- bash -c "
     weston --backend=x11-backend.so --width=$WESTON_W --height=$WESTON_H &
     sleep 3
     export WAYLAND_DISPLAY=\$(basename \$(find \$XDG_RUNTIME_DIR -name 'wayland-*'))
     echo '✅ WAYLAND_DISPLAY='\$WAYLAND_DISPLAY
-    waydroid show-full-ui
+    waydroid show-full-ui --windowed
   " &
-
-  echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
-  echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
-
 fi
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
+echo "💡 有効にするには次を実行してください: source ~/.bashrc"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

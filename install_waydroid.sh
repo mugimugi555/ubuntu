@@ -68,7 +68,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 if [ "$ENV_TYPE" = "wayland" ]; then
 
   echo "🔗 Wayland 用 alias を登録中..."
-  ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui --windowed'"
+  ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui'"
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
@@ -108,7 +108,7 @@ else
       sleep 3;
       export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*'));
       echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY;
-      waydroid show-full-ui --windowed
+      waydroid show-full-ui
     \"
   '"
 

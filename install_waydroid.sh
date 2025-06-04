@@ -48,12 +48,12 @@ waydroid session stop || true
 if [ "$ENV_TYPE" = "wayland" ]; then
 
   echo "🚀 Wayland 用 Waydroid を起動します..."
-  ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui'"
+  ALIAS_CMD="alias waydroid_start='waydroid session stop || true && waydroid show-full-ui --windowed'"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
 
-  waydroid show-full-ui &
+  waydroid show-full-ui --windowed &
 
   echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
   echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"

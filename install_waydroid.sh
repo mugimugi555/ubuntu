@@ -45,20 +45,27 @@ if [ "$ENV_TYPE" = "wayland" ]; then
 
   echo "🚀 Wayland 用 Waydroid を起動します..."
   ALIAS_CMD="alias waydroid_start='waydroid show-full-ui'"
-  
+
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc
-  
+
   # 起動（初回のみ）
   waydroid show-full-ui &
 
   echo "✅ 'waydroid_start' エイリアスを ~/.bashrc に登録しました。"
   echo "💡 今すぐ有効にするには 'source ~/.bashrc' を実行してください。"
-    
+
 else
 
   echo "🚀 X11 用 Weston 経由で Waydroid を起動します..."
   sudo apt install -y weston x11-xserver-utils
+
+  # 既存の weston を終了（重複起動防止）
+  if pgrep -f "weston --backend=x11-backend.so" > /dev/null; then
+    echo "🛑 既存の Weston セッションを終了します..."
+    pkill -f "weston --backend=x11-backend.so"
+    sleep 1
+  fi
 
   # 解像度取得（現在の物理ディスプレイ）
   SCREEN_RES=$(xrandr | grep '*' | awk '{print $1}' | head -n1)
@@ -77,7 +84,7 @@ else
 
   # 起動エイリアスを ~/.bashrc に追加
   echo "🔗 Weston + Waydroid 起動用 alias を ~/.bashrc に登録します..."
-  ALIAS_CMD="alias waydroid_start='dbus-run-session -- bash -c \"weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} & sleep 3; export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\$XDG_RUNTIME_DIR -name 'wayland-*')); echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY; waydroid show-full-ui\"'"
+  ALIAS_CMD="alias waydroid_start='pgrep -f \"weston --backend=x11-backend.so\" > /dev/null && echo 🚫 既に起動中です || dbus-run-session -- bash -c \"weston --backend=x11-backend.so --width=${WESTON_W} --height=${WESTON_H} & sleep 3; export WAYLAND_DISPLAY=\\\$(basename \\\$(find \\\\$XDG_RUNTIME_DIR -name 'wayland-*')); echo ✅ WAYLAND_DISPLAY=\\\$WAYLAND_DISPLAY; waydroid show-full-ui\"'"
 
   sed -i '/alias waydroid_start=/d' ~/.bashrc
   echo "$ALIAS_CMD" >> ~/.bashrc

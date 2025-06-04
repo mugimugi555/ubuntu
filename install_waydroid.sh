@@ -1,38 +1,50 @@
 #!/bin/bash
 set -e
 
-echo "🔹 Waydroid インストール開始..."
+echo "🔰 Waydroid 自動インストールスクリプト (Wayland / X11 判別対応)"
 
-# 必要な依存関係をインストール
-echo "🔸 依存関係をインストール..."
+# 1. ディスプレイサーバーの種類を判定
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+  ENV_TYPE="wayland"
+else
+  ENV_TYPE="x11"
+fi
+
+echo "🖥️ 検出されたセッションタイプ: $ENV_TYPE"
+
+# 2. Waydroid リポジトリ追加
+echo "🔸 Waydroid リポジトリを追加します..."
 sudo apt update
-sudo apt install -y curl ca-certificates gnupg lsb-release wget jq
+sudo apt install -y curl ca-certificates gnupg lsb-release wget
+curl -s https://repo.waydro.id | sudo bash
 
-# Waydroid リポジトリの追加
-echo "🔸 Waydroid リポジトリを追加..."
-curl -fsSL https://repo.waydro.id | sudo bash
-
-# Waydroid のインストール
-echo "🔸 Waydroid をインストール..."
-sudo apt update
+# 3. Waydroid 本体のインストール
+echo "📦 Waydroid をインストールします..."
 sudo apt install -y waydroid
 
-# カーネルモジュールの確認
-echo "🔸 binder, ashmem の確認・有効化..."
-sudo modprobe binder_linux || echo "⚠️ binder_linux がロードできません。"
-sudo modprobe ashmem_linux || echo "⚠️ ashmem_linux がロードできません。"
+# 4. カーネルモジュールの確認と警告
+echo "🔎 binder/ashmem モジュールの確認..."
+if ! lsmod | grep -q binder_linux; then
+  echo "⚠️ binder_linux が読み込まれていません。"
+fi
+if ! lsmod | grep -q ashmem_linux; then
+  echo "⚠️ ashmem_linux が読み込まれていません。"
+fi
 
-# Waydroid 初期化
-echo "🔸 Waydroid を初期化..."
-sudo waydroid init
+# 5. Waydroid 初期化（GAPPSあり）
+echo "🔧 Waydroid の初期化を行います..."
+sudo waydroid init -s GAPPS -f
 
-# Waydroid サービス起動
-echo "🔸 Waydroid サービスを起動します..."
+# 6. サービス起動
+echo "🔃 Waydroid コンテナサービスを有効化・起動します..."
 sudo systemctl enable waydroid-container
 sudo systemctl start waydroid-container
 
-# GUI起動方法案内
-echo "✅ インストール完了！Waydroid を起動するには以下を実行してください："
-echo ""
-echo "  waydroid session start"
-echo "  waydroid show-full-ui"
+# 7. 起動コマンド（環境によって変える）
+if [ "$ENV_TYPE" = "wayland" ]; then
+  echo "🚀 Wayland 用 Waydroid を起動します..."
+  waydroid show-full-ui
+else
+  echo "🚀 X11 用 Waydroid を起動します..."
+  waydroid show-full-ui
+fi

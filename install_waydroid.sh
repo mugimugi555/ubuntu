@@ -40,11 +40,33 @@ echo "🔃 Waydroid コンテナサービスを有効化・起動します..."
 sudo systemctl enable waydroid-container
 sudo systemctl start waydroid-container
 
-# 7. 起動コマンド（環境によって変える）
+# 7. 起動コマンド（Wayland / X11 判定）
 if [ "$ENV_TYPE" = "wayland" ]; then
   echo "🚀 Wayland 用 Waydroid を起動します..."
   waydroid show-full-ui
 else
-  echo "🚀 X11 用 Waydroid を起動します..."
-  waydroid show-full-ui
+  echo "🚀 X11 用 Weston 経由で Waydroid を起動します..."
+  sudo apt install -y weston x11-xserver-utils
+
+  # 解像度取得（現在の物理ディスプレイ）
+  SCREEN_RES=$(xrandr | grep '*' | awk '{print $1}' | head -n1)
+  SCREEN_WIDTH=$(echo $SCREEN_RES | cut -d'x' -f1)
+  SCREEN_HEIGHT=$(echo $SCREEN_RES | cut -d'x' -f2)
+
+  if [ "$SCREEN_WIDTH" -ge 1920 ] && [ "$SCREEN_HEIGHT" -ge 1080 ]; then
+    WESTON_SIZE="1920x1080"
+  else
+    WESTON_SIZE="${SCREEN_WIDTH}x${SCREEN_HEIGHT}"
+  fi
+
+  echo "📐 使用する Weston 解像度: $WESTON_SIZE"
+
+  # Weston + Waydroid 起動
+  dbus-run-session -- bash -c "
+    weston --backend=x11-backend.so --width=$(echo $WESTON_SIZE | cut -d'x' -f1) --height=$(echo $WESTON_SIZE | cut -d'x' -f2) &
+    sleep 3
+    export WAYLAND_DISPLAY=\$(basename \$(find \$XDG_RUNTIME_DIR -name 'wayland-*'))
+    echo '✅ WAYLAND_DISPLAY='\$WAYLAND_DISPLAY
+    waydroid show-full-ui
+  "
 fi

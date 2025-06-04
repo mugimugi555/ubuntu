@@ -73,7 +73,7 @@ if [ "$ENV_TYPE" = "wayland" ]; then
   echo "$ALIAS_CMD" >> ~/.bashrc
 
   echo "🟢 Waydroid 起動（ウィンドウモード）..."
-  waydroid show-full-ui --windowed &
+  waydroid show-full-ui &
 
 else
   echo "🔗 X11 用 weston 経由の Waydroid 起動を準備中..."
@@ -121,7 +121,7 @@ else
     sleep 3
     export WAYLAND_DISPLAY=\$(basename \$(find \$XDG_RUNTIME_DIR -name 'wayland-*'))
     echo '✅ WAYLAND_DISPLAY='\$WAYLAND_DISPLAY
-    waydroid show-full-ui --windowed
+    waydroid show-full-ui
   " &
 fi
 

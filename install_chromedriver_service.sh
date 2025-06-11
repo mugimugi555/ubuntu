@@ -48,10 +48,10 @@ if [ "$INSTALLED_DRIVER_VERSION" != "$CHROME_VERSION" ]; then
 
   wget -O "/tmp/chromedriver.zip" "$DRIVER_URL"
   unzip -o "/tmp/chromedriver.zip" -d "/tmp/"
-  mkdir -p "$CHROME_DRIVER_DIR"
-  rm -f "$CHROME_DRIVER_DIR/chromedriver"
-  mv "/tmp/chromedriver-linux64/chromedriver" "$CHROME_DRIVER_DIR/chromedriver"
-  chmod +x "$CHROME_DRIVER_DIR/chromedriver"
+  sudo mkdir -p "$CHROME_DRIVER_DIR"
+  sudo rm -f "$CHROME_DRIVER_DIR/chromedriver"
+  sudo mv "/tmp/chromedriver-linux64/chromedriver" "$CHROME_DRIVER_DIR/chromedriver"
+  sudo chmod +x "$CHROME_DRIVER_DIR/chromedriver"
   rm -rf "/tmp/chromedriver.zip" "/tmp/chromedriver-linux64"
 
   echo "🎉 ChromeDriver $DRIVER_VERSION を正常にインストールしました！"

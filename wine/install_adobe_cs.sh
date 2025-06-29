@@ -1,28 +1,57 @@
 #!/bin/bash
 set -e
 
-# === Adobe CS バージョン選択 ===
-echo "🔹 インストールする Adobe Creative Suite のバージョンを選択してください:"
-echo "  1: CS4"
-echo "  2: CS5"
-echo "  3: CS6"
-read -p "番号を入力 [1-3]（デフォルト: 2）: " VERSION
+echo "🔹 Adobe CS インストールセットアップ開始"
 
-case "$VERSION" in
-    1) CS_VERSION="CS4" ;;
-    3) CS_VERSION="CS6" ;;
-    *) CS_VERSION="CS5" ;;
-esac
+# === カレントディレクトリをスキャン ===
+echo "🔎 カレントディレクトリ内を検索中..."
+CS_DIRS=()
+while IFS= read -r -d '' dir; do
+  CS_DIRS+=("$dir")
+done < <(find . -maxdepth 1 -type d -name "Adobe CS*" -print0 | sort -z)
 
-INSTALLER_PATH="$HOME/Downloads/Adobe $CS_VERSION/Set-up.exe"
+NUM_DIRS=${#CS_DIRS[@]}
+
+if [ "$NUM_DIRS" -eq 0 ]; then
+  echo "❌ カレントディレクトリに 'Adobe CS*' フォルダが見つかりません。"
+  echo "📌 例: 'Adobe CS5' というフォルダを置いてください。"
+  exit 1
+elif [ "$NUM_DIRS" -eq 1 ]; then
+  SELECTED_DIR="${CS_DIRS[0]}"
+  echo "✅ フォルダを自動選択: $SELECTED_DIR"
+else
+  echo "🔹 複数の Adobe CS フォルダが見つかりました。番号を選んでください:"
+  for i in "${!CS_DIRS[@]}"; do
+    echo "  $((i+1)): ${CS_DIRS[$i]}"
+  done
+  read -p "番号を入力 [1-$NUM_DIRS]: " SELECTION
+  if ! [[ "$SELECTION" =~ ^[1-9][0-9]*$ ]] || [ "$SELECTION" -lt 1 ] || [ "$SELECTION" -gt "$NUM_DIRS" ]; then
+    echo "❌ 無効な選択です。終了します。"
+    exit 1
+  fi
+  SELECTED_DIR="${CS_DIRS[$((SELECTION-1))]}"
+  echo "✅ 選択したフォルダ: $SELECTED_DIR"
+fi
+
+# === バージョン抽出 ===
+CS_VERSION=$(basename "$SELECTED_DIR" | grep -o 'CS[0-9]\+')
+if [ -z "$CS_VERSION" ]; then
+  echo "❌ フォルダ名からバージョンが認識できません。"
+  exit 1
+fi
+
+INSTALLER_PATH="$SELECTED_DIR/Set-up.exe"
 WINEPREFIX="$HOME/.wine-$CS_VERSION"
 
 # === インストーラーの存在確認 ===
 if [ ! -f "$INSTALLER_PATH" ]; then
-    echo "❌ Adobe $CS_VERSION のインストーラーが見つかりません: $INSTALLER_PATH"
-    echo "📌 手動でダウンロードし、上記の場所に保存してください。"
-    exit 1
+  echo "❌ インストーラーが見つかりません: $INSTALLER_PATH"
+  echo "📌 '$SELECTED_DIR' に Set-up.exe を配置してください。"
+  exit 1
 fi
+
+echo "✅ バージョン: $CS_VERSION"
+echo "✅ インストーラーパス: $INSTALLER_PATH"
 
 # === Ubuntu バージョンチェック + WineHQ ソース確認 ===
 UBUNTU_CODENAME=$(lsb_release -cs)
